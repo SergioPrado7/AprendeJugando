@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aprende Jugando</title>
+  <style>
+    /* Reset y estilos globales */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: linear-gradient(180deg, #2c89f9 0%, #ffffff 100%); /* Cielo */
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+    .container {
+      width: 900px;
+      position: relative;
+      /* Escalar según ancho de pantalla, origen en el centro */
+      transform: scale(min(1, calc(100vw / 900)));
+      transform-origin: center center;
+    }
+    /* Nubes con posiciones originales */
+    .cloud {
+      position: absolute;
+      z-index: 1;
+    }
+    .cloud1 {
+      top: -48px;
+      left: -275px;
+      width: 205px;
+    }
+    .cloud2 {
+      top: 91px;
+      right: -75px;
+      width: 340px;
+      z-index: 5;
+    }
+    .cloud3 {
+      top: 300px;
+      left: -235px;
+      width: 165px;
+    }
+    /* Pizarra */
+    .board {
+      position: relative;
+      width: 100%;
+    }
+    .board-bg {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    /* Título original */
+    .title {
+      position: absolute;
+      top: 75px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 48px;
+      color: #ff4d4d;
+      text-shadow: 1px 1px 0 rgba(0,0,0,0.3);
+      z-index: 3;
+    }
+    /* Botones con valores originales */
+    .btn {
+      position: absolute;
+      width: 200px;
+      padding: 10px 0;
+      border: 3px dashed #fff;
+      border-radius: 8px;
+      background: transparent;
+      color: #fff;
+      font-size: 18px;
+      text-align: center;
+      cursor: pointer;
+      z-index: 3;
+    }
+    .btn.login   { top: 180px; left: 50%; transform: translateX(-50%); }
+    .btn.signup  { top: 260px; left: 50%; transform: translateX(-50%); }
+    .btn.lookup  { top: 340px; left: 50%; transform: translateX(-50%); }
+    /* León posicionado original */
+    .lion {
+      position: absolute;
+      bottom: 80px;
+      right: 130px;
+      width: 175px;
+      z-index: 3;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Nubes de fondo -->
+    <img src="/assets/cloud.png" alt="Nube" class="cloud cloud1">
+    <img src="/assets/cloud.png" alt="Nube" class="cloud cloud2">
+    <img src="/assets/cloud.png" alt="Nube" class="cloud cloud3">
+
+    <!-- Pizarra con elementos interiores -->
+    <div class="board">
+      <img src="/assets/board.png" alt="Pizarra" class="board-bg">
+      <h1 class="title">Aprende Jugando</h1>
+
+      <a href="/html/login.html"><button class="btn login">Iniciar sesión</button></a>
+      <a href="/html/registro.html"><button class="btn signup">Registrarse</button></a>
+      <a href="/html/consultaravance.html"><button class="btn lookup">Consultar</button></a>
+
+      <img src="/assets/leon.png" alt="León" class="lion">
+    </div>
+  </div>
+</body>
+</html>

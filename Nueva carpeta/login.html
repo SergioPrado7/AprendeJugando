@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Iniciar sesión - Aprende Jugando</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="login-container">
+    <h1 class="login-title">Iniciar sesión</h1>
+
+    <form class="login-form">
+      <div class="form-group">
+        <label for="user">Usuario o correo</label>
+        <input type="text" id="user" name="user" placeholder="Tu usuario o correo" required />
+      </div>
+
+      <div class="form-group">
+        <label for="password">Contraseña</label>
+        <div class="password-wrapper">
+          <input type="password" id="password" name="password" placeholder="••••••••" required />
+          <button type="button" class="toggle-password">👁️</button>
+        </div>
+        <small class="hint">Mínimo 8 caracteres</small>
+      </div>
+
+      <button type="submit" class="btn-login">Iniciar sesión</button>
+      <p class="forgot">¿Olvidaste tu contraseña?, clic <a href="/html/recuperar.html">aquí</a></p>
+    </form>
+
+    <!-- Nubes de fondo -->
+    <img src="/assets/cloud.png" alt="Nube" class="cloud c1" />
+    <img src="/assets/cloud.png" alt="Nube" class="cloud c2" />
+    <img src="/assets/cloud.png" alt="Nube" class="cloud c3" />
+  </div>
+
+  <script>
+    // Mostrar u ocultar contraseña
+    document.querySelector('.toggle-password').addEventListener('click', () => {
+      const inp = document.getElementById('password');
+      inp.type = inp.type === 'password' ? 'text' : 'password';
+    });
+
+    // Manejar el envío del formulario
+    document.querySelector('.login-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const user = document.getElementById('user').value;
+      const password = document.getElementById('password').value;
+
+      try {
+        const response = await fetch('http://localhost:3000/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ user, password })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          alert('Inicio de sesión exitoso');
+          window.location.href = '/html/recuperar.html';
+        } else {
+          alert(result.message || 'Credenciales inválidas');
+        }
+      } catch (error) {
+        alert('Error al conectar con el servidor');
+        console.error(error);
+      }
+    });
+  </script>
+</body>
+</html>

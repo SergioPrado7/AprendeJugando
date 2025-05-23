@@ -1,0 +1,60 @@
+<!-- archivo: recuperar.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Recuperar cuenta</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <div class="recovery-container">
+    <h1 class="recovery-title">Recuperar cuenta</h1>
+
+    <p class="recovery-text">
+      Ingresa el correo con el que creaste la cuenta,<br>
+      nosotros te enviaremos un enlace para que<br>
+      cambies tu contraseña.
+    </p>
+
+    <form class="recovery-form">
+      <label for="correo" class="recovery-label">Correo</label>
+      <div class="recovery-input-wrapper">
+        <span class="recovery-input-icon">📧</span>
+        <input type="email" id="correo" class="recovery-input" placeholder="mail@example.com" required />
+      </div>
+
+      <button type="submit" class="recovery-button">Enviar correo</button>
+    </form>
+
+    <!-- Nubes de fondo -->
+    <img src="/assets/cloud.png" alt="Nube" class="cloudRecuperar cr1" />
+    <img src="/assets/cloud.png" alt="Nube" class="cloudRecuperar cr2" />
+    <img src="/assets/cloud.png" alt="Nube" class="cloudRecuperar cr3" />
+  </div>
+
+  <script>
+    document.querySelector('.recovery-form').addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const correo = document.getElementById('correo').value;
+
+      try {
+        const response = await fetch('http://localhost:3000/enviar_recuperacion', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ correo })
+        });
+
+        const result = await response.json();
+        if (result.success) {
+          alert('Correo enviado exitosamente. Revisa tu bandeja.');
+        } else {
+          alert('Error: ' + result.message);
+        }
+      } catch (error) {
+        alert('Error al conectar con el servidor');
+      }
+    });
+  </script>
+</body>
+</html>

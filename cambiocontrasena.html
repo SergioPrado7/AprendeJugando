@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cambiar contraseña</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cabin+Sketch:wght@700&family=Pangolin&display=swap');
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      font-family: 'Pangolin', cursive;
+      background: linear-gradient(180deg, #2c89f9 0%, #ffffff 100%);
+      height: 100vh;
+      margin: 0;
+      overflow: hidden;
+      position: relative;
+      padding: 2vh;
+    }
+
+    .password-container {
+      background: #fff;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+      width: 90%;
+      max-width: 500px;
+      z-index: 10;
+      text-align: center;
+    }
+
+    .password-title {
+      font-family: 'Cabin Sketch', cursive;
+      font-size: clamp(2rem, 5vw, 2.8rem);
+      color: #2c89f9;
+      margin-bottom: 2rem;
+      text-shadow: 1px 1px rgba(0,0,0,0.1);
+    }
+
+    .form-password {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+      width: 100%;
+    }
+
+    .password-field label {
+      font-size: clamp(0.95rem, 2.5vw, 1.1rem);
+      color: #2c89f9;
+      font-weight: bold;
+      display: block;
+      text-align: left;
+      margin-bottom: 0.5rem;
+    }
+
+    .password-wrapper {
+      position: relative;
+    }
+
+    .password-wrapper input {
+      width: 100%;
+      padding: 1rem;
+      padding-right: 3rem;
+      font-size: clamp(0.9rem, 2.5vw, 1rem);
+      border: 2px solid #ccc;
+      border-radius: 6px;
+      font-family: 'Pangolin', cursive;
+    }
+
+    .toggle-password {
+      position: absolute;
+      top: 50%;
+      right: 1rem;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+
+    .hint {
+      font-size: 0.8rem;
+      color: #666;
+      margin-top: 0.5rem;
+      text-align: left;
+    }
+
+    .btn-save {
+      font-family: 'Cabin Sketch', cursive;
+      font-size: clamp(1rem, 3vw, 1.1rem);
+      padding: 0.75rem 2rem;
+      background: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-top: 1rem;
+    }
+
+    .btn-save:hover {
+      background: #005ecc;
+    }
+
+    .cloudPassword {
+      position: absolute;
+      opacity: 0.8;
+      z-index: 1;
+    }
+
+    .cp1 {
+      top: 20%;
+      left: 5%;
+      width: 180px;
+    }
+
+    .cp2 {
+      bottom: 10%;
+      right: 5%;
+      width: 180px;
+    }
+  </style>
+</head>
+<body>
+  <div class="password-container">
+    <h1 class="password-title">Cambiar contraseña</h1>
+    <form class="form-password">
+      <div class="password-field">
+        <label for="new-password">Contraseña nueva</label>
+        <div class="password-wrapper">
+          <input type="password" id="new-password" placeholder="********" required />
+          <button type="button" class="toggle-password" onclick="togglePassword('new-password')">👁️</button>
+        </div>
+        <small class="hint">Mínimo 8 caracteres</small>
+      </div>
+
+      <div class="password-field">
+        <label for="confirm-password">Confirmar contraseña</label>
+        <div class="password-wrapper">
+          <input type="password" id="confirm-password" placeholder="********" required />
+          <button type="button" class="toggle-password" onclick="togglePassword('confirm-password')">👁️</button>
+        </div>
+        <small class="hint">Mínimo 8 caracteres</small>
+      </div>
+
+      <button type="submit" class="btn-save">Guardar cambios</button>
+    </form>
+  </div>
+
+  <!-- Nubes -->
+  <img src="/assets/cloud.png" alt="Nube" class="cloudPassword cp1" />
+  <img src="/assets/cloud.png" alt="Nube" class="cloudPassword cp2" />
+
+  <script>
+    function togglePassword(id) {
+      const input = document.getElementById(id);
+      input.type = input.type === 'password' ? 'text' : 'password';
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const correo = urlParams.get('correo');
+
+    if (!correo) {
+      alert("Correo inválido. Usa el enlace de recuperación correcto.");
+      window.location.href = "/html/login.html";
+    }
+
+    document.querySelector('.form-password').addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      const nueva = document.getElementById('new-password').value;
+      const confirmar = document.getElementById('confirm-password').value;
+
+      if (nueva.length < 8 || confirmar.length < 8) {
+        alert("La contraseña debe tener al menos 8 caracteres.");
+        return;
+      }
+
+      if (nueva !== confirmar) {
+        alert("Las contraseñas no coinciden.");
+        return;
+      }
+
+      try {
+        const response = await fetch('http://localhost:3000/cambiar_contrasena_correo', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ correo, nueva })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          alert("Contraseña actualizada. Inicia sesión.");
+          window.location.href = "/html/login.html";
+        } else {
+          alert("Error: " + result.message);
+        }
+      } catch (error) {
+        alert("Error al conectar con el servidor.");
+      }
+    });
+  </script>
+</body>
+</html>

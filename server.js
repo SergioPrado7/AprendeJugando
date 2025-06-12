@@ -36,42 +36,42 @@ app.post('/login', async (req, res) => {
   }
 });
 
+// RUTA: Registrar usuario
 app.post('/registrar', async (req, res) => {
-  // Extraemos exactamente esas ocho propiedades del body:
   const {
-    nombre,        // para @Nombre
-    apellido_p,    // para @ApellidoPaterno
-    apellido_m,    // para @ApellidoMaterno
-    nombre_u,      // para @NombreUsuario
-    edad,          // para @Edad
-    correo,        // para @Correo
-    contrasena,    // para @Contraseña
-    estado         // para @Estado
+    nombre, apellido_p, apellido_m,
+    nombre_u, edad, correo, contrasena, estado
   } = req.body;
 
+  // Validaciones servidor
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const passRegex = /^(?=.{8,}$)(?=.*[A-Z])(?=.*\d)(?=.*\W).*$/;
+
+  if (typeof edad !== 'number' || edad < 6 || edad > 15) {
+    return res.status(400).json({ success: false, message: 'La edad debe ser entre 6 y 15.' });
+  }
+  if (!emailRegex.test(correo)) {
+    return res.status(400).json({ success: false, message: 'Correo electrónico inválido.' });
+  }
+  if (!passRegex.test(contrasena)) {
+    return res.status(400).json({ success: false, message: 'Contraseña no cumple los requisitos.' });
+  }
+
   try {
-    // 1) Nos conectamos a la BD
     await sql.connect(config);
+    const request = new sql.Request()
+      .input('Nombre', sql.NVarChar(100), nombre)
+      .input('ApellidoPaterno', sql.NVarChar(100), apellido_p)
+      .input('ApellidoMaterno', sql.NVarChar(100), apellido_m)
+      .input('NombreUsuario', sql.NVarChar(50), nombre_u)
+      .input('Edad', sql.Int, edad)
+      .input('Correo', sql.NVarChar(150), correo)
+      .input('Contraseña', sql.NVarChar(255), contrasena)
+      .input('Estado', sql.NVarChar(100), estado);
 
-    // 2) Creamos la request y le inyectamos cada parámetro
-    const request = new sql.Request();
-    request.input('Nombre',           sql.NVarChar(100), nombre);
-    request.input('ApellidoPaterno',  sql.NVarChar(100), apellido_p);
-    request.input('ApellidoMaterno',  sql.NVarChar(100), apellido_m);
-    request.input('NombreUsuario',    sql.NVarChar(50),  nombre_u);
-    request.input('Edad',             sql.Int,           edad);
-    request.input('Correo',           sql.NVarChar(150), correo);
-    request.input('Contraseña',       sql.NVarChar(255), contrasena);
-    request.input('Estado',           sql.NVarChar(100), estado);
-
-    // 3) Ejecutamos el procedimiento almacenado tal como está en tu BD
     await request.execute('sp_InsertarUsuario');
-
-    // 4) Devolvemos respuesta de éxito
     res.json({ success: true, message: 'Usuario registrado exitosamente.' });
   } catch (err) {
-    // Si ocurre algún error (por ejemplo, el SP levanta RAISERROR),
-    // devolvemos el mensaje para que el cliente lo pueda manejar.
     res.status(500).json({ success: false, message: err.message });
   }
 });

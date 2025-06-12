@@ -2,111 +2,147 @@
 <html lang="es">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nivel Difícil Lectura</title>
-    <link rel="stylesheet" href="styleDificil.css">
-    <link rel="icon" href="imagenes/favicon.ico" type="image/x-icon">
-    <style>
-        .btn {
-            position: absolute;
-            font-size: clamp(1rem, 1vw, 0.5rem);
-            padding: clamp(0.5rem, 2vw, 0.75rem) 2rem;
-            background: #fff;
-            color: #000;
-            border: #000;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background 0.2s;
-            width: 100%;
-            max-width: 200px;
-        }
-
-        .btn.pantallaTitulo {
-            top: 3%;
-            left: 75%;
-            transform: translateX(-50%);
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nivel Difícil Lectura</title>
+  <link rel="stylesheet" href="styleDificil.css">
+  <link rel="icon" href="imagenes/favicon.ico" type="image/x-icon">
+  <style>
+    .btn {
+      position: absolute;
+      font-size: clamp(1rem, 1vw, 0.5rem);
+      padding: clamp(0.5rem, 2vw, 0.75rem) 2rem;
+      background: #fff;
+      color: #000;
+      border: 1px solid #000;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.2s;
+      width: auto;
+      max-width: 200px;
+      text-align: center;
+    }
+    .btn.pantallaTitulo {
+      top: 3%;
+      left: 75%;
+      transform: translateX(-50%);
+      z-index: 2;
+    }
+  </style>
 </head>
 
 <body>
-    <main class="dificilLectura">
-        <div class="header">
-            <h1 class="titulo NivelNormal">Lectura - Nivel Difícil</h1>
-            <div class="guardarPartida">
-                <input type="submit" id="guardarPartida" value="Guardar Partida">
-            </div>
-            <div class="pantallaTitulo">
-                <a href="/interfazjuego.html"><button class="btn pantallaTitulo">Pantalla de Título</button></a>
-            </div>
-        </div>
-        <div class="nivel1">
-            <img src="/imagenes/cloud.png" alt="Nube" class="cloudFacilLectura cloud1">
-            <a href="/nivel1_lectura_dificil.html" class="TEXTO Nivel1">Nivel 1</a>
-        </div>
-        <div class="nivel2">
-            <img src="/imagenes/cloud.png" alt="Nube" class="cloudFacilLectura cloud2">
-            <a href="/nivel2_lectura_dificil.html" class="TEXTO Nivel2">Nivel 2</a>
-        </div>
-        <div class="nivel3">
-            <img src="/imagenes/cloud.png" alt="Nube" class="cloudFacilLectura cloud3">
-            <a href="/nivel3_lectura_dificil.html" class="TEXTO Nivel3">Nivel 3</a>
-        </div>
-        <div class="nivel4">
-            <img src="/imagenes/cloud.png" alt="Nube" class="cloudFacilLectura cloud4">
-            <a href="/nivel4_lectura_dificil.html" class="TEXTO Nivel4">Nivel 4</a>
-        </div>
-        <div class="nivel5">
-            <img src="/imagenes/cloud.png" alt="Nube" class="cloudFacilLectura cloud5">
-            <a href="/nivel5_lectura_dificil.html" class="TEXTO Nivel5">Nivel 5</a>
-        </div>
-        <div class="background">
-            <img src="/imagenes/Ground.png" alt="Ground" class="Background ground">
-            <img src="/imagenes/Ground.png" alt="Ground" class="Background ground1">
-            <img src="/imagenes/Ground.png" alt="Ground" class="Background ground2">
-            <img src="/imagenes/Ground.png" alt="Ground" class="Background ground3">
-            <img src="/imagenes/luna.png" alt="sol" class="Background Luna">
-            <img src="/imagenes/casa.png" alt="escuela" class="Background Casa">
-            <img src="/imagenes/zorro.png" alt="zorro" class="Background Zorro">
-            <img src="/imagenes/leon1.png" alt="leon" class="Background Leon">
-        </div>
-        <script>
-            // Bloquear niveles 2 a 5 por defecto
-            for (let i = 2; i <= 5; i++) {
-                const enlace = document.querySelector(`.Nivel${i}`);
-                if (enlace) {
-                    enlace.style.pointerEvents = "none";
-                    enlace.style.opacity = "0.5";
-                }
-            }
-            const params = new URLSearchParams(window.location.search);
-            const nivelCompletado = params.get("nivel");
+  <main class="dificilLectura">
+    <div class="header">
+      <h1 class="titulo NivelNormal">Lectura - Nivel Difícil</h1>
+      <div class="guardarPartida">
+        <input type="submit" id="guardarPartida" value="Guardar Partida">
+      </div>
+      <div class="pantallaTitulo">
+        <a href="/interfazjuego.html">
+          <button class="btn pantallaTitulo">Pantalla de Título</button>
+        </a>
+      </div>
+    </div>
 
-            if (nivelCompletado) {
-                // Marcar el nivel completado con check
-                const enlaceNivel = document.querySelector(`.Nivel${nivelCompletado}`);
-                if (enlaceNivel) {
-                    enlaceNivel.textContent += " ✓";
-                    enlaceNivel.style.color = "green";
-                }
+    <!-- Nubes / niveles -->
+    <div class="nivel1">
+      <img src="/imagenes/cloud.png" alt="Nube" class="cloudFacilLectura cloud1">
+      <a href="#" id="startNivel1" class="TEXTO Nivel1">Nivel 1</a>
+    </div>
+    <div class="nivel2">
+      <img src="/imagenes/cloud.png" alt="Nube" class="cloudFacilLectura cloud2">
+      <a href="#" id="startNivel2" class="TEXTO Nivel2">Nivel 2</a>
+    </div>
+    <div class="nivel3">
+      <img src="/imagenes/cloud.png" alt="Nube" class="cloudFacilLectura cloud3">
+      <a href="#" id="startNivel3" class="TEXTO Nivel3">Nivel 3</a>
+    </div>
+    <div class="nivel4">
+      <img src="/imagenes/cloud.png" alt="Nube" class="cloudFacilLectura cloud4">
+      <a href="#" id="startNivel4" class="TEXTO Nivel4">Nivel 4</a>
+    </div>
+    <div class="nivel5">
+      <img src="/imagenes/cloud.png" alt="Nube" class="cloudFacilLectura cloud5">
+      <a href="#" id="startNivel5" class="TEXTO Nivel5">Nivel 5</a>
+    </div>
 
-                // Desbloquear el siguiente nivel
-                const siguiente = parseInt(nivelCompletado) + 1;
-                const enlaceSiguiente = document.querySelector(`.Nivel${siguiente}`);
-                if (enlaceSiguiente) {
-                    enlaceSiguiente.href = `/nivel${siguiente}_lectura_dificil.html`;
-                    enlaceSiguiente.style.pointerEvents = "auto";
-                    enlaceSiguiente.style.opacity = "1";
-                }
-            }
-            // Mostrar alerta si se completaron todos los niveles
-            const todosCompletados = [1, 2, 3, 4, 5].every(nivel => completados.includes(nivel));
-            if (todosCompletados) {
-                alert("¡Felicidades! Has completado todos los niveles de Lectura Difícil");
-            }    
-        </script>
-    </main>
+    <div class="background">
+      <img src="/imagenes/Ground.png" alt="Ground" class="Background ground">
+      <img src="/imagenes/Ground.png" alt="Ground" class="Background ground1">
+      <img src="/imagenes/Ground.png" alt="Ground" class="Background ground2">
+      <img src="/imagenes/Ground.png" alt="Ground" class="Background ground3">
+      <img src="/imagenes/luna.png" alt="sol" class="Background Luna">
+      <img src="/imagenes/casa.png" alt="escuela" class="Background Casa">
+      <img src="/imagenes/zorro.png" alt="zorro" class="Background Zorro">
+      <img src="/imagenes/leon1.png" alt="leon" class="Background Leon">
+    </div>
+  </main>
+
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // 1) Bloquear acceso si no completaste Matemáticas Normal
+    if (localStorage.getItem('normal_mate_completed') !== 'true') {
+      alert('Debes completar primero Matemáticas Normal.');
+      return window.location.href = '/html/interfazjuego.html';
+    }
+
+    const difficulty = 'dificil',
+          subject    = 'lectura',
+          total      = 5,
+          keyLevels  = `${difficulty}_${subject}_levels_completed`;
+
+    let done = JSON.parse(localStorage.getItem(keyLevels) || '[]');
+
+    // 2) Bloquear niveles 2–5 inicialmente
+    for (let i = 2; i <= total; i++) {
+      const el = document.querySelector(`.Nivel${i}`);
+      if (el) {
+        el.style.pointerEvents = 'none';
+        el.style.opacity       = '0.5';
+      }
+    }
+
+    // 3) Registrar nivel completado si venimos con ?nivel=X
+    const lvl = parseInt(new URLSearchParams(location.search).get('nivel'), 10);
+    if (lvl >= 1 && lvl <= total && !done.includes(lvl)) {
+      done.push(lvl);
+      localStorage.setItem(keyLevels, JSON.stringify(done));
+    }
+
+    // 4) Marcar ✓, bloquear esa nube y desbloquear la siguiente
+    done.forEach(n => {
+      const a = document.querySelector(`.Nivel${n}`);
+      if (a) {
+        a.textContent         += ' ✓';
+        a.style.color          = 'green';
+        a.style.pointerEvents = 'none';
+      }
+      const next = document.querySelector(`.Nivel${n + 1}`);
+      if (next) {
+        next.style.pointerEvents = 'auto';
+        next.style.opacity       = '1';
+      }
+    });
+
+    // 5) Al completar los 5, marcar flag global y alerta
+    if (done.length === total && localStorage.getItem('dificil_lectura_completed') !== 'true') {
+      localStorage.setItem('dificil_lectura_completed', 'true');
+      alert('¡Felicidades! Has completado todos los niveles de Lectura Difícil');
+    }
+
+    // 6) Arrancar cada nivel al click en las nubes
+    for (let i = 1; i <= total; i++) {
+      const el = document.getElementById(`startNivel${i}`);
+      if (el) {
+        el.addEventListener('click', ev => {
+          ev.preventDefault();
+          window.location.href = `/nivel${i}_lectura_dificil.html?nivel=${i}`;
+        });
+      }
+    }
+  });
+  </script>
 </body>
 
 </html>

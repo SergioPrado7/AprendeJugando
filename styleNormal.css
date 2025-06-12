@@ -199,4 +199,5 @@ body {
     transition: background 0.2s;
     width: 100%;
     max-width: 200px;
+    z-index: 2;
 }

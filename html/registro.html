@@ -11,7 +11,7 @@
   <h1 class="titulo_r cabin-sketch-bold">Regístrate para empezar a jugar</h1>
 
   <div class="registro cabin-sketch-bold">
-    <form>
+    <form id="formRegistro">
       <div class="nombre contenedor">
         <label for="nombre">Nombre</label>
         <input type="text" id="nombre" name="nombre" placeholder="Ingresa tu nombre" required />
@@ -29,16 +29,24 @@
         <input type="text" id="nombre_u" name="nombre_u" placeholder="Ingresa tu nombre de usuario" required />
       </div>
       <div class="edad contenedor">
-        <label for="edad">Edad</label>
-        <input type="number" id="edad" name="edad" placeholder="Ingresa tu edad" min="0" max="99" required />
+        <label for="edad">Edad (6–15 años)</label>
+        <input type="number" id="edad" name="edad" placeholder="Ingresa tu edad" min="6" max="15" required />
       </div>
       <div class="correo contenedor">
         <label for="correo">Correo electrónico</label>
-        <input type="email" id="correo" name="correo" placeholder="Ingresa un correo electrónico" required />
+        <input type="email" id="correo" name="correo" placeholder="ejemplo@dominio.com" required />
       </div>
       <div class="contrasena contenedor">
         <label for="contrasena">Contraseña</label>
-        <input type="password" id="contrasena" name="contrasena" placeholder="Ingresa tu contraseña" required />
+        <input
+          type="password"
+          id="contrasena"
+          name="contrasena"
+          placeholder="Al menos 8 car., 1 may., 1 num., 1 especial"
+          pattern="(?=^.{8,}$)(?=.*[A-Z])(?=.*\d)(?=.*\W).*$"
+          title="Mínimo 8 caracteres, 1 mayúscula, 1 número y 1 carácter especial"
+          required
+        />
       </div>
       <div class="estado contenedor">
         <label for="estado">Selecciona tu estado</label>
@@ -84,18 +92,35 @@
     </form>
 
     <script>
-      const form = document.querySelector("form");
+      const form = document.getElementById("formRegistro");
       form.addEventListener("submit", async (e) => {
         e.preventDefault();
+
+        const edad = parseInt(document.getElementById("edad").value, 10);
+        const correo = document.getElementById("correo").value.trim();
+        const contrasena = document.getElementById("contrasena").value;
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const passRegex = /^(?=.{8,}$)(?=.*[A-Z])(?=.*\d)(?=.*\W).*$/;
+
+        if (edad < 6 || edad > 15) {
+          return alert("La edad debe ser un número entre 6 y 15.");
+        }
+        if (!emailRegex.test(correo)) {
+          return alert("Ingresa un correo electrónico válido.");
+        }
+        if (!passRegex.test(contrasena)) {
+          return alert("La contraseña debe tener al menos 8 caracteres, una mayúscula, un número y un carácter especial.");
+        }
 
         const data = {
           nombre: document.getElementById("nombre").value,
           apellido_p: document.getElementById("apellido_p").value,
           apellido_m: document.getElementById("apellido_m").value,
           nombre_u: document.getElementById("nombre_u").value,
-          edad: document.getElementById("edad").value,
-          correo: document.getElementById("correo").value,
-          contrasena: document.getElementById("contrasena").value,
+          edad,
+          correo,
+          contrasena,
           estado: document.getElementById("estado").value,
         };
 
@@ -105,21 +130,12 @@
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(data),
           });
-
           const result = await response.json();
-          console.log(result); // Para depurar
 
           if (result.success) {
-            // Guarda el correo (opcional para usar en otras pantallas)
-            localStorage.setItem("usuarioCorreo", data.correo);
-
-            // Mostrar mensaje de éxito
+            localStorage.setItem("usuarioCorreo", correo);
             alert("Usuario registrado correctamente");
-
-            // Espera 2 segundos y redirige
-            setTimeout(() => {
-              window.location.href = "/html/aprendejugando.html";
-            }, 2000);
+            setTimeout(() => window.location.href = "/html/aprendejugando.html", 2000);
           } else {
             alert(result.message || "Ocurrió un error al registrarse.");
           }

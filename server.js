@@ -167,3 +167,40 @@ app.post('/progreso', async (req, res) => {
   }
 });
 
+app.post('/guardar_progreso', async (req, res) => {
+  const { usuarioId, materia, dificultad, nivel, completado } = req.body;
+
+  try {
+    await sql.connect(config);
+    const request = new sql.Request()
+      .input('UsuarioId', sql.Int, usuarioId)
+      .input('Materia', sql.NVarChar, materia)
+      .input('Dificultad', sql.NVarChar, dificultad)
+      .input('Nivel', sql.Int, nivel)
+      .input('Completado', sql.Bit, completado);
+
+    await request.execute('sp_GuardarProgreso');
+    res.json({ success: true, message: 'Progreso guardado' });
+  } catch (err) {
+    console.error('Error al guardar progreso:', err);
+    res.status(500).json({ success: false, message: 'Error al guardar progreso' });
+  }
+});
+
+app.get('/obtenerProgreso', async (req, res) => {
+  const { usuarioId, materia, dificultad } = req.query;
+  try {
+    const pool = await sql.connect(config);
+    const result = await pool
+      .request()
+      .input('usuarioId', sql.Int, usuarioId)
+      .input('materia', sql.VarChar, materia)
+      .input('dificultad', sql.VarChar, dificultad)
+      .execute('sp_ObtenerProgreso'); // procedimiento almacenado
+    const progreso = result.recordset[0];
+    res.json(progreso);
+  } catch (error) {
+    console.error('Error al obtener progreso:', error);
+    res.status(500).json({ mensaje: 'Error en el servidor' });
+  }
+});

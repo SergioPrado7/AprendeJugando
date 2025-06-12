@@ -40,7 +40,7 @@
       </div>
     </div>
 
-    <!-- AHORA con href="#" y id para lanzar Lógica Fácil -->
+    <!-- Niveles -->
     <div class="nivel1">
       <img src="/imagenes/cloud.png" alt="Nube" class="cloudFacilLectura cloud1">
       <a href="#" id="startNivel1" class="TEXTO Nivel1">Nivel 1</a>
@@ -75,7 +75,7 @@
   </main>
 
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
       // 1) Bloquea si aún no completaste Lectura Fácil
       if (localStorage.getItem('facil_lectura_completed') !== 'true') {
         alert('Debes completar primero Lectura Fácil.');
@@ -85,7 +85,8 @@
       const difficulty = 'facil',
             subject    = 'logica',
             total      = 5,
-            keyLevels  = `${difficulty}_${subject}_levels_completed`;
+            keyLevels  = `${difficulty}_${subject}_levels_completed`,
+            usuarioId  = localStorage.getItem('usuarioId');
 
       let done = JSON.parse(localStorage.getItem(keyLevels) || '[]');
 
@@ -105,7 +106,7 @@
         localStorage.setItem(keyLevels, JSON.stringify(done));
       }
 
-      // 4) Marca ✔, bloquea esa nube y DESbloquea la siguiente
+      // 4) Marca ✔, bloquea esa nube y desbloquea la siguiente
       done.forEach(n => {
         const a = document.querySelector(`.Nivel${n}`);
         if (a) {
@@ -136,6 +137,46 @@
           });
         }
       }
+
+      // 7) GUARDAR PROGRESO EN BASE DE DATOS
+      const btnGuardar = document.getElementById('guardarPartida');
+      btnGuardar.addEventListener('click', async () => {
+        if (!usuarioId || done.length === 0) {
+          return alert('No hay niveles completados o no hay sesión activa.');
+        }
+
+        for (const nivel of done) {
+          try {
+            await fetch('http://localhost:3000/guardar_progreso', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                usuarioId: parseInt(usuarioId),
+                materia: subject,
+                dificultad: difficulty,
+                nivel: nivel,
+                completado: true
+              })
+            });
+          } catch (error) {
+            console.error(`Error al guardar nivel ${nivel}:`, error);
+          }
+        }
+
+        alert('¡Progreso guardado en la base de datos!');
+      });
+
+      // 8) OBTENER PROGRESO DESDE LA BASE DE DATOS (opcional, solo log)
+      if (usuarioId) {
+        try {
+          const res = await fetch(`http://localhost:3000/obtenerProgreso?usuarioId=${usuarioId}&materia=${subject}&dificultad=${difficulty}`);
+          const data = await res.json();
+          console.log('Progreso desde base de datos:', data);
+        } catch (error) {
+          console.error('Error al obtener el progreso:', error);
+        }
+      }
+
     });
   </script>
 </body>

@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Nivel Difícil Lectura</title>
   <link rel="stylesheet" href="styleDificil.css">
@@ -30,7 +29,6 @@
     }
   </style>
 </head>
-
 <body>
   <main class="dificilLectura">
     <div class="header">
@@ -45,7 +43,7 @@
       </div>
     </div>
 
-    <!-- Nubes / niveles -->
+    <!-- Nubes -->
     <div class="nivel1">
       <img src="/imagenes/cloud.png" alt="Nube" class="cloudFacilLectura cloud1">
       <a href="#" id="startNivel1" class="TEXTO Nivel1">Nivel 1</a>
@@ -72,77 +70,110 @@
       <img src="/imagenes/Ground.png" alt="Ground" class="Background ground1">
       <img src="/imagenes/Ground.png" alt="Ground" class="Background ground2">
       <img src="/imagenes/Ground.png" alt="Ground" class="Background ground3">
-      <img src="/imagenes/luna.png" alt="sol" class="Background Luna">
-      <img src="/imagenes/casa.png" alt="escuela" class="Background Casa">
+      <img src="/imagenes/luna.png" alt="luna" class="Background Luna">
+      <img src="/imagenes/casa.png" alt="casa" class="Background Casa">
       <img src="/imagenes/zorro.png" alt="zorro" class="Background Zorro">
       <img src="/imagenes/leon1.png" alt="leon" class="Background Leon">
     </div>
   </main>
 
   <script>
-  document.addEventListener('DOMContentLoaded', () => {
-    // 1) Bloquear acceso si no completaste Matemáticas Normal
-    if (localStorage.getItem('normal_mate_completed') !== 'true') {
-      alert('Debes completar primero Matemáticas Normal.');
-      return window.location.href = '/html/interfazjuego.html';
-    }
-
-    const difficulty = 'dificil',
-          subject    = 'lectura',
-          total      = 5,
-          keyLevels  = `${difficulty}_${subject}_levels_completed`;
-
-    let done = JSON.parse(localStorage.getItem(keyLevels) || '[]');
-
-    // 2) Bloquear niveles 2–5 inicialmente
-    for (let i = 2; i <= total; i++) {
-      const el = document.querySelector(`.Nivel${i}`);
-      if (el) {
-        el.style.pointerEvents = 'none';
-        el.style.opacity       = '0.5';
+    document.addEventListener('DOMContentLoaded', () => {
+      if (localStorage.getItem('normal_mate_completed') !== 'true') {
+        alert('Debes completar primero Matemáticas Normal.');
+        return window.location.href = '/html/interfazjuego.html';
       }
-    }
 
-    // 3) Registrar nivel completado si venimos con ?nivel=X
-    const lvl = parseInt(new URLSearchParams(location.search).get('nivel'), 10);
-    if (lvl >= 1 && lvl <= total && !done.includes(lvl)) {
-      done.push(lvl);
-      localStorage.setItem(keyLevels, JSON.stringify(done));
-    }
+      const difficulty = 'dificil',
+            subject    = 'lectura',
+            total      = 5,
+            keyLevels  = `${difficulty}_${subject}_levels_completed`,
+            usuarioId  = localStorage.getItem('usuarioId');
 
-    // 4) Marcar ✓, bloquear esa nube y desbloquear la siguiente
-    done.forEach(n => {
-      const a = document.querySelector(`.Nivel${n}`);
-      if (a) {
-        a.textContent         += ' ✓';
-        a.style.color          = 'green';
-        a.style.pointerEvents = 'none';
+      let done = JSON.parse(localStorage.getItem(keyLevels) || '[]');
+
+      // Bloquear niveles 2–5 inicialmente
+      for (let i = 2; i <= total; i++) {
+        const el = document.querySelector(`.Nivel${i}`);
+        if (el) {
+          el.style.pointerEvents = 'none';
+          el.style.opacity = '0.5';
+        }
       }
-      const next = document.querySelector(`.Nivel${n + 1}`);
-      if (next) {
-        next.style.pointerEvents = 'auto';
-        next.style.opacity       = '1';
+
+      // Desbloquear siempre nivel 1
+      const nivel1 = document.querySelector('.Nivel1');
+      if (nivel1) {
+        nivel1.style.pointerEvents = 'auto';
+        nivel1.style.opacity = '1';
       }
+
+      // Si venimos con ?nivel=X lo registramos
+      const lvl = parseInt(new URLSearchParams(location.search).get('nivel'), 10);
+      if (lvl >= 1 && lvl <= total && !done.includes(lvl)) {
+        done.push(lvl);
+        localStorage.setItem(keyLevels, JSON.stringify(done));
+      }
+
+      // Marcar completados y desbloquear el siguiente
+      done.forEach(n => {
+        const el = document.querySelector(`.Nivel${n}`);
+        if (el) {
+          el.textContent += ' ✓';
+          el.style.color = 'green';
+          el.style.pointerEvents = 'none';
+        }
+        const siguiente = document.querySelector(`.Nivel${n + 1}`);
+        if (siguiente) {
+          siguiente.style.pointerEvents = 'auto';
+          siguiente.style.opacity = '1';
+        }
+      });
+
+      // Si terminó todos los niveles, marcar como completado global
+      if (done.length === total && localStorage.getItem('dificil_lectura_completed') !== 'true') {
+        localStorage.setItem('dificil_lectura_completed', 'true');
+        alert('¡Felicidades! Has completado todos los niveles de Lectura Difícil');
+      }
+
+      // Activar niveles al hacer clic
+      for (let i = 1; i <= total; i++) {
+        const el = document.getElementById(`startNivel${i}`);
+        if (el) {
+          el.addEventListener('click', ev => {
+            ev.preventDefault();
+            window.location.href = `/nivel${i}_lectura_dificil.html?nivel=${i}`;
+          });
+        }
+      }
+
+      // Guardar progreso al backend
+      document.getElementById('guardarPartida').addEventListener('click', async () => {
+        if (!usuarioId || done.length === 0) {
+          return alert('No hay sesión activa o progreso que guardar.');
+        }
+
+        for (const nivel of done) {
+          try {
+            await fetch('http://localhost:3000/guardar_progreso', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                usuarioId: parseInt(usuarioId),
+                materia: subject,
+                dificultad: difficulty,
+                nivel: nivel,
+                completado: true
+              })
+            });
+          } catch (err) {
+            console.error(`Error guardando nivel ${nivel}:`, err);
+          }
+        }
+
+        alert('¡Progreso guardado correctamente!');
+      });
     });
-
-    // 5) Al completar los 5, marcar flag global y alerta
-    if (done.length === total && localStorage.getItem('dificil_lectura_completed') !== 'true') {
-      localStorage.setItem('dificil_lectura_completed', 'true');
-      alert('¡Felicidades! Has completado todos los niveles de Lectura Difícil');
-    }
-
-    // 6) Arrancar cada nivel al click en las nubes
-    for (let i = 1; i <= total; i++) {
-      const el = document.getElementById(`startNivel${i}`);
-      if (el) {
-        el.addEventListener('click', ev => {
-          ev.preventDefault();
-          window.location.href = `/nivel${i}_lectura_dificil.html?nivel=${i}`;
-        });
-      }
-    }
-  });
   </script>
 </body>
-
 </html>

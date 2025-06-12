@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -30,7 +29,6 @@
     }
   </style>
 </head>
-
 <body>
   <main class="normalLogica">
     <div class="header">
@@ -80,7 +78,6 @@
 
   <script>
   document.addEventListener('DOMContentLoaded', () => {
-    // 1) bloquear si no completaste Normal Lectura
     if (localStorage.getItem('normal_lectura_completed') !== 'true') {
       alert('Debes completar primero Lectura Normal.');
       return window.location.href = '/html/interfazjuego.html';
@@ -89,11 +86,11 @@
     const difficulty = 'normal',
           subject    = 'logica',
           total      = 5,
-          keyLevels  = `${difficulty}_${subject}_levels_completed`;
+          keyLevels  = `${difficulty}_${subject}_levels_completed`,
+          usuarioId  = localStorage.getItem('usuarioId');
 
     let done = JSON.parse(localStorage.getItem(keyLevels) || '[]');
 
-    // 2) bloquear niveles 2–5 inicialmente
     for (let i = 2; i <= total; i++) {
       const el = document.querySelector(`.Nivel${i}`);
       if (el) {
@@ -102,14 +99,12 @@
       }
     }
 
-    // 3) si llegamos con ?nivel=X, añadirlo a done
     const lvl = parseInt(new URLSearchParams(location.search).get('nivel'), 10);
     if (lvl >= 1 && lvl <= total && !done.includes(lvl)) {
       done.push(lvl);
       localStorage.setItem(keyLevels, JSON.stringify(done));
     }
 
-    // 4) marcar ✔, bloquear nube completada, desbloquear siguiente
     done.forEach(n => {
       const a = document.querySelector(`.Nivel${n}`);
       if (a) {
@@ -124,13 +119,17 @@
       }
     });
 
-    // 5) si completaste todos, marcar flag global y alerta
     if (done.length === total && localStorage.getItem('normal_logica_completed') !== 'true') {
       localStorage.setItem('normal_logica_completed', 'true');
       alert('¡Felicidades! Has completado todos los niveles de Lógica Normal');
     }
 
-    // 6) arranque niveles al click en las nubes
+    const nivel1 = document.querySelector('.Nivel1');
+    if (nivel1) {
+      nivel1.style.pointerEvents = 'auto';
+      nivel1.style.opacity       = '1';
+    }
+
     for (let i = 1; i <= total; i++) {
       const el = document.getElementById(`startNivel${i}`);
       if (el) {
@@ -140,8 +139,33 @@
         });
       }
     }
+
+    document.getElementById('guardarPartida').addEventListener('click', async () => {
+      if (!usuarioId || done.length === 0) {
+        return alert('No hay niveles completados o no hay sesión activa.');
+      }
+
+      for (const nivel of done) {
+        try {
+          await fetch('http://localhost:3000/guardar_progreso', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              usuarioId: parseInt(usuarioId),
+              materia: subject,
+              dificultad: difficulty,
+              nivel: nivel,
+              completado: true
+            })
+          });
+        } catch (error) {
+          console.error(`Error al guardar nivel ${nivel}:`, error);
+        }
+      }
+
+      alert('¡Progreso guardado en la base de datos!');
+    });
   });
   </script>
 </body>
-
 </html>

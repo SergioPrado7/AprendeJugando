@@ -70,11 +70,12 @@
   </main>
 
   <script>
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', async () => {
     const difficulty = 'facil',
           subject    = 'lectura',
           total      = 5,
-          keyLevels  = `${difficulty}_${subject}_levels_completed`;
+          keyLevels  = `${difficulty}_${subject}_levels_completed`,
+          usuarioId  = localStorage.getItem('usuarioId');
 
     let done = JSON.parse(localStorage.getItem(keyLevels) || '[]');
 
@@ -123,6 +124,45 @@
           ev.preventDefault();
           window.location.href = `/nivel${i}_lectura_facil.html?nivel=${i}`;
         });
+      }
+    }
+
+    // 👉 GUARDAR progreso al hacer clic en "Guardar Partida"
+    const btnGuardar = document.getElementById('guardarPartida');
+    btnGuardar.addEventListener('click', async () => {
+      if (!usuarioId || done.length === 0) {
+        return alert('No hay niveles completados o no hay sesión activa.');
+      }
+
+      for (const nivel of done) {
+        try {
+          await fetch('http://localhost:3000/guardar_progreso', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              usuarioId: parseInt(usuarioId),
+              materia: subject,
+              dificultad: difficulty,
+              nivel: nivel,
+              completado: true
+            })
+          });
+        } catch (error) {
+          console.error(`Error al guardar nivel ${nivel}:`, error);
+        }
+      }
+
+      alert('¡Progreso guardado en la base de datos!');
+    });
+
+    // 👉 OBTENER progreso desde BD al cargar (solo si lo quieres, puedes comentarlo si no lo usas)
+    if (usuarioId) {
+      try {
+        const res = await fetch(`http://localhost:3000/obtenerProgreso?usuarioId=${usuarioId}&materia=${subject}&dificultad=${difficulty}`);
+        const data = await res.json();
+        console.log('Progreso desde base de datos:', data);
+      } catch (error) {
+        console.error('Error al obtener el progreso:', error);
       }
     }
   });

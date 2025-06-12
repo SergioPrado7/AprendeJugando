@@ -180,11 +180,14 @@
         }
 
         data.forEach(registro => {
+          const materiaCapitalizada = registro.materia.charAt(0).toUpperCase() + registro.materia.slice(1);
+          const dificultadCapitalizada = registro.dificultad.charAt(0).toUpperCase() + registro.dificultad.slice(1);
+
           const fila = `
             <tr>
-              <td>${registro.materia}</td>
+              <td>${materiaCapitalizada}</td>
               <td>${registro.niveles_correctos + registro.niveles_incorrectos}</td>
-              <td>${registro.dificultad}</td>
+              <td>${dificultadCapitalizada}</td>
               <td>${registro.niveles_correctos}</td>
               <td>${registro.niveles_incorrectos}</td>
               <td>${registro.progreso.toFixed(0)}%</td>

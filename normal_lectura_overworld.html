@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -30,7 +29,6 @@
     }
   </style>
 </head>
-
 <body>
   <main class="normalLectura">
     <div class="header">
@@ -45,7 +43,6 @@
       </div>
     </div>
 
-    <!-- Nubes / niveles con IDs para control JS -->
     <div class="nivel1">
       <img src="/imagenes/cloud.png" alt="Nube" class="cloudFacilLectura cloud1">
       <a href="#" id="startNivel1" class="TEXTO Nivel1">Nivel 1</a>
@@ -81,7 +78,6 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      // 1) Bloquea si no completaste Matemáticas Fácil
       if (localStorage.getItem('facil_mate_completed') !== 'true') {
         alert('Debes completar primero Matemáticas Fácil.');
         return window.location.href = '/html/interfazjuego.html';
@@ -90,48 +86,50 @@
       const difficulty = 'normal',
             subject    = 'lectura',
             total      = 5,
-            keyLevels  = `${difficulty}_${subject}_levels_completed`;
+            keyLevels  = `${difficulty}_${subject}_levels_completed`,
+            usuarioId  = localStorage.getItem('usuarioId');
 
       let done = JSON.parse(localStorage.getItem(keyLevels) || '[]');
 
-      // 2) Bloquear niveles 2–5 al inicio
       for (let i = 2; i <= total; i++) {
         const el = document.querySelector(`.Nivel${i}`);
         if (el) {
           el.style.pointerEvents = 'none';
-          el.style.opacity       = '0.5';
+          el.style.opacity = '0.5';
         }
       }
 
-      // 3) Si llegamos con ?nivel=X, lo agregamos
       const lvl = parseInt(new URLSearchParams(location.search).get('nivel'), 10);
       if (lvl >= 1 && lvl <= total && !done.includes(lvl)) {
         done.push(lvl);
         localStorage.setItem(keyLevels, JSON.stringify(done));
       }
 
-      // 4) Marcar ✔, bloquear nube completada y desbloquear siguiente
       done.forEach(n => {
         const a = document.querySelector(`.Nivel${n}`);
         if (a) {
-          a.textContent         += ' ✓';
-          a.style.color          = 'green';
+          a.textContent += ' ✓';
+          a.style.color = 'green';
           a.style.pointerEvents = 'none';
         }
-        const nxt = document.querySelector(`.Nivel${n+1}`);
-        if (nxt) {
-          nxt.style.pointerEvents = 'auto';
-          nxt.style.opacity       = '1';
+        const next = document.querySelector(`.Nivel${n + 1}`);
+        if (next) {
+          next.style.pointerEvents = 'auto';
+          next.style.opacity = '1';
         }
       });
 
-      // 5) Si completaste todos, marca global y alerta
       if (done.length === total && localStorage.getItem('normal_lectura_completed') !== 'true') {
         localStorage.setItem('normal_lectura_completed', 'true');
         alert('¡Felicidades! Has completado todos los niveles de Lectura Normal');
       }
 
-      // 6) Arrancar niveles al click en las nubes
+      const nivel1 = document.querySelector('.Nivel1');
+      if (nivel1) {
+        nivel1.style.pointerEvents = 'auto';
+        nivel1.style.opacity = '1';
+      }
+
       for (let i = 1; i <= total; i++) {
         const el = document.getElementById(`startNivel${i}`);
         if (el) {
@@ -141,8 +139,33 @@
           });
         }
       }
+
+      document.getElementById('guardarPartida').addEventListener('click', async () => {
+        if (!usuarioId || done.length === 0) {
+          return alert('No hay niveles completados o no hay sesión activa.');
+        }
+
+        for (const nivel of done) {
+          try {
+            await fetch('http://localhost:3000/guardar_progreso', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                usuarioId: parseInt(usuarioId),
+                materia: subject,
+                dificultad: difficulty,
+                nivel: nivel,
+                completado: true
+              })
+            });
+          } catch (error) {
+            console.error(`Error al guardar nivel ${nivel}:`, error);
+          }
+        }
+
+        alert('¡Progreso guardado en la base de datos!');
+      });
     });
   </script>
 </body>
-
 </html>

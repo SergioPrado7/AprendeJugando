@@ -1,12 +1,11 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Nivel Fácil Matemáticas</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="icon" href="imagenes/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="imagenes/favicon.ico" type="image/x-icon" />
   <style>
     .btn {
       position: absolute;
@@ -31,13 +30,12 @@
     }
   </style>
 </head>
-
 <body>
   <main class="facilMate">
     <div class="header">
       <h1 class="titulo NivelFacil">Matemáticas - Nivel Fácil</h1>
       <div class="guardarPartida">
-        <input type="submit" id="guardarPartida" value="Guardar Partida">
+        <input type="submit" id="guardarPartida" value="Guardar Partida" />
       </div>
       <div class="pantallaTitulo">
         <a href="/interfazjuego.html">
@@ -46,104 +44,130 @@
       </div>
     </div>
 
-    <!-- Nubes / niveles con ID para arrancar -->
+    <!-- Niveles -->
     <div class="nivel1">
-      <img src="/imagenes/cloud.png" alt="Nube" class="cloudFacilLectura cloud1">
+      <img src="/imagenes/cloud.png" alt="Nube" class="cloudFacilLectura cloud1" />
       <a href="#" id="startNivel1" class="TEXTO Nivel1">Nivel 1</a>
     </div>
     <div class="nivel2">
-      <img src="/imagenes/cloud.png" alt="Nube" class="cloudFacilLectura cloud2">
+      <img src="/imagenes/cloud.png" alt="Nube" class="cloudFacilLectura cloud2" />
       <a href="#" id="startNivel2" class="TEXTO Nivel2">Nivel 2</a>
     </div>
     <div class="nivel3">
-      <img src="/imagenes/cloud.png" alt="Nube" class="cloudFacilLectura cloud3">
+      <img src="/imagenes/cloud.png" alt="Nube" class="cloudFacilLectura cloud3" />
       <a href="#" id="startNivel3" class="TEXTO Nivel3">Nivel 3</a>
     </div>
     <div class="nivel4">
-      <img src="/imagenes/cloud.png" alt="Nube" class="cloudFacilLectura cloud4">
+      <img src="/imagenes/cloud.png" alt="Nube" class="cloudFacilLectura cloud4" />
       <a href="#" id="startNivel4" class="TEXTO Nivel4">Nivel 4</a>
     </div>
     <div class="nivel5">
-      <img src="/imagenes/cloud.png" alt="Nube" class="cloudFacilLectura cloud5">
+      <img src="/imagenes/cloud.png" alt="Nube" class="cloudFacilLectura cloud5" />
       <a href="#" id="startNivel5" class="TEXTO Nivel5">Nivel 5</a>
     </div>
 
     <div class="background">
-      <img src="/imagenes/Ground.png" alt="Ground" class="Background ground">
-      <img src="/imagenes/Ground.png" alt="Ground" class="Background ground1">
-      <img src="/imagenes/Ground.png" alt="Ground" class="Background ground2">
-      <img src="/imagenes/Ground.png" alt="Ground" class="Background ground3">
-      <img src="/imagenes/sol.webp" alt="sol" class="Background Sol">
-      <img src="/imagenes/School.png" alt="escuela" class="Background Escuela">
-      <img src="/imagenes/zorro.png" alt="zorro" class="Background Zorro">
-      <img src="/imagenes/leon1.png" alt="leon" class="Background Leon">
+      <img src="/imagenes/Ground.png" alt="Ground" class="Background ground" />
+      <img src="/imagenes/Ground.png" alt="Ground" class="Background ground1" />
+      <img src="/imagenes/Ground.png" alt="Ground" class="Background ground2" />
+      <img src="/imagenes/Ground.png" alt="Ground" class="Background ground3" />
+      <img src="/imagenes/sol.webp" alt="sol" class="Background Sol" />
+      <img src="/imagenes/School.png" alt="escuela" class="Background Escuela" />
+      <img src="/imagenes/zorro.png" alt="zorro" class="Background Zorro" />
+      <img src="/imagenes/leon1.png" alt="leon" class="Background Leon" />
     </div>
   </main>
 
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      // 1) Validar que completaste Lógica Fácil
-      if (localStorage.getItem('facil_logica_completed') !== 'true') {
-        alert('Debes completar primero Lógica Fácil.');
-        return window.location.href = '/html/interfazjuego.html';
+    document.addEventListener("DOMContentLoaded", async () => {
+      if (localStorage.getItem("facil_logica_completed") !== "true") {
+        alert("Debes completar primero Lógica Fácil.");
+        return (window.location.href = "/html/interfazjuego.html");
       }
 
-      const difficulty = 'facil',
-            subject    = 'mate',
-            total      = 5,
-            keyLevels  = `${difficulty}_${subject}_levels_completed`;
+      const difficulty = "facil",
+        subject = "mate",
+        total = 5,
+        keyLevels = `${difficulty}_${subject}_levels_completed`,
+        usuarioId = localStorage.getItem("usuarioId");
 
-      let done = JSON.parse(localStorage.getItem(keyLevels) || '[]');
+      let done = JSON.parse(localStorage.getItem(keyLevels) || "[]");
 
-      // 2) Bloquear nubes 2–5 inicialmente
+      // Bloquear niveles 2–5 al inicio
       for (let i = 2; i <= total; i++) {
-        const link = document.querySelector(`.Nivel${i}`);
-        if (link) {
-          link.style.pointerEvents = 'none';
-          link.style.opacity       = '0.5';
+        const el = document.querySelector(`.Nivel${i}`);
+        if (el) {
+          el.style.pointerEvents = "none";
+          el.style.opacity = "0.5";
         }
       }
 
-      // 3) Si llegamos con ?nivel=X, añadimos ese nivel completado
-      const lvl = parseInt(new URLSearchParams(location.search).get('nivel'), 10);
+      // Agregar nivel desde ?nivel=X
+      const lvl = parseInt(new URLSearchParams(location.search).get("nivel"), 10);
       if (lvl >= 1 && lvl <= total && !done.includes(lvl)) {
         done.push(lvl);
         localStorage.setItem(keyLevels, JSON.stringify(done));
       }
 
-      // 4) Para cada nivel completado: marcar ✓, bloquear esa nube y desbloquear la siguiente
-      done.forEach(n => {
+      // Marcar completados y desbloquear el siguiente
+      done.forEach((n) => {
         const a = document.querySelector(`.Nivel${n}`);
         if (a) {
-          a.textContent += ' ✓';
-          a.style.color        = 'green';
-          a.style.pointerEvents = 'none';
+          a.textContent += " ✓";
+          a.style.color = "green";
+          a.style.pointerEvents = "none";
         }
         const next = document.querySelector(`.Nivel${n + 1}`);
         if (next) {
-          next.style.pointerEvents = 'auto';
-          next.style.opacity       = '1';
+          next.style.pointerEvents = "auto";
+          next.style.opacity = "1";
         }
       });
 
-      // 5) Si completaste todos los 5, marca el flag global y alerta
-      if (done.length === total && localStorage.getItem('facil_mate_completed') !== 'true') {
-        localStorage.setItem('facil_mate_completed', 'true');
-        alert('¡Felicidades! Has completado todos los niveles de Matemáticas Fácil');
+      // Marcar completado global si todos están hechos
+      if (done.length === total && localStorage.getItem("facil_mate_completed") !== "true") {
+        localStorage.setItem("facil_mate_completed", "true");
+        alert("¡Felicidades! Has completado todos los niveles de Matemáticas Fácil");
       }
 
-      // 6) Arrancar cada nivel al clicar su nube
+      // Click para ir al nivel
       for (let i = 1; i <= total; i++) {
         const el = document.getElementById(`startNivel${i}`);
         if (el) {
-          el.addEventListener('click', ev => {
+          el.addEventListener("click", (ev) => {
             ev.preventDefault();
             window.location.href = `/nivel${i}_mate_facil.html?nivel=${i}`;
           });
         }
       }
+
+      // Guardar progreso individualmente
+      document.getElementById("guardarPartida").addEventListener("click", async () => {
+        if (!usuarioId || done.length === 0) {
+          return alert("No hay niveles completados o no hay sesión activa.");
+        }
+
+        for (const nivel of done) {
+          try {
+            await fetch("http://localhost:3000/guardar_progreso", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                usuarioId: parseInt(usuarioId),
+                materia: subject,
+                dificultad: difficulty,
+                nivel: nivel,
+                completado: true,
+              }),
+            });
+          } catch (error) {
+            console.error(`Error al guardar nivel ${nivel}:`, error);
+          }
+        }
+
+        alert("¡Progreso guardado en la base de datos!");
+      });
     });
   </script>
 </body>
-
 </html>

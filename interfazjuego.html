@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aprende Jugando</title>
+  <link rel="icon" href="/assets/favicon.ico">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: linear-gradient(180deg, #2c89f9 0%, #ffffff 100%);
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+    .container {
+      width: 900px;
+      position: relative;
+      transform: scale(min(1, calc(100vw / 900)));
+      transform-origin: center center;
+    }
+    .cloud {
+      position: absolute;
+      z-index: 1;
+    }
+    .cloud1 {
+      top: -48px;
+      left: -275px;
+      width: 205px;
+    }
+    .cloud2 {
+      top: 91px;
+      right: -75px;
+      width: 340px;
+      z-index: 5;
+    }
+    .cloud3 {
+      top: 300px;
+      left: -235px;
+      width: 165px;
+    }
+    .board {
+      position: relative;
+      width: 100%;
+    }
+    .board-bg {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    .title {
+      position: absolute;
+      top: 75px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 48px;
+      color: #ff4d4d;
+      text-shadow: 1px 1px 0 rgba(0,0,0,0.3);
+      z-index: 3;
+    }
+    .btn {
+      position: absolute;
+      width: 200px;
+      padding: 10px 0;
+      border: 3px dashed #fff;
+      border-radius: 8px;
+      background: transparent;
+      color: #fff;
+      font-size: 18px;
+      text-align: center;
+      cursor: pointer;
+      z-index: 3;
+    }
+    .btn.jugar         { top: 180px; left: 50%; transform: translateX(-50%); }
+    .btn.configuracion { top: 260px; left: 50%; transform: translateX(-50%); }
+    .btn.cerrarsesion  { top: 340px; left: 50%; transform: translateX(-50%); }
+    .lion {
+      position: absolute;
+      bottom: 80px;
+      right: 130px;
+      width: 175px;
+      z-index: 3;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <img src="/assets/cloud.png" alt="Nube" class="cloud cloud1">
+    <img src="/assets/cloud.png" alt="Nube" class="cloud cloud2">
+    <img src="/assets/cloud.png" alt="Nube" class="cloud cloud3">
+
+    <div class="board">
+      <img src="/assets/board.png" alt="Pizarra" class="board-bg">
+      <h1 class="title">Aprende Jugando</h1>
+
+      <a href="#" id="btn-jugar"><button class="btn jugar">Jugar</button></a>
+      <a href="/html/configuracionjuego.html"><button class="btn configuracion">Configuración</button></a>
+      <button class="btn cerrarsesion" id="btn-logout">Cerrar Sesión</button>
+
+      <img src="/assets/leon.png" alt="León" class="lion">
+    </div>
+  </div>
+
+  <script>
+    // Verificar que el usuario esté logueado
+    window.addEventListener('DOMContentLoaded', () => {
+      const usuarioId = localStorage.getItem('usuarioId');
+      if (!usuarioId) {
+        alert("Debes iniciar sesión.");
+        window.location.href = '../html/login.html';
+      }
+    });
+
+    document.getElementById('btn-logout').addEventListener('click', () => {
+      localStorage.clear();
+      window.location.href = '../html/login.html';
+    });
+
+    document.getElementById('btn-jugar').addEventListener('click', () => {
+      const dificultad = localStorage.getItem("dificultad");
+      const materia = localStorage.getItem("materia");
+
+      if (!dificultad || !materia) {
+        alert("Primero configura la dificultad y materia.");
+        window.location.href = "/html/configuracionjuego.html";
+        return;
+      }
+
+      let ruta = "";
+
+      if (dificultad === "Fácil" && materia === "Lectura") {
+        ruta = "../facil_lectura_overworld.html";
+      } else if (dificultad === "Fácil" && materia === "Lógica") {
+        ruta = "../facil_logica_overworld.html";
+      } else if (dificultad === "Fácil" && materia === "Matemática") {
+        ruta = "../facil_mate_overworld.html";
+      } else if (dificultad === "Normal" && materia === "Lectura") {
+        ruta = "../normal_lectura_overworld.html";
+      } else if (dificultad === "Normal" && materia === "Lógica") {
+        ruta = "../normal_logica_overworld.html";
+      } else if (dificultad === "Normal" && materia === "Matemática") {
+        ruta = "../normal_mate_overworld.html";
+      } else if (dificultad === "Difícil" && materia === "Lectura") {
+        ruta = "../dificil_lectura_overworld.html";
+      } else if (dificultad === "Difícil" && materia === "Lógica") {
+        ruta = "../dificil_logica_overworld.html";
+      } else if (dificultad === "Difícil" && materia === "Matemática") {
+        ruta = "../dificil_mate_overworld.html";
+      } else {
+        alert("Configuración no válida.");
+        return;
+      }
+
+      window.location.href = ruta;
+    });
+  </script>
+</body>
+</html>

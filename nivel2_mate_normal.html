@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nivel 2 - Matemáticas Normal</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="imagenes/favicon.ico" type="image/x-icon">
+    <style>
+        body {
+            background: linear-gradient(180deg, #ff9800 0%, #ffffff 100%);
+            /* Cielo */
+            font-family: 'Cabin Sketch', cursive;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        #titulo {
+            position: absolute;
+            top: 15%;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #ffF;
+            text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.3);
+            z-index: 3;
+            font-size: 38px;
+            opacity: 1;
+            text-align: center;
+        }
+
+        #subtitle {
+            font-family: 'Comic Sans MS', cursive;
+            font-weight: 500;
+            font-size: 19px;
+            margin-bottom: 20px;
+            color: #fff;
+            position: absolute;
+            top: 23%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50%;
+            max-height: 200px;
+            overflow-y: hidden;
+            padding: 10px;
+            line-height: 1.5;
+            text-align: justify;
+            z-index: 3
+        }
+
+        .Level1 {
+            position: absolute;
+            opacity: 1;
+            z-index: 1;
+        }
+
+        .pizarra {
+            top: 0%;
+            left: 15%;
+            width: 70%;
+        }
+
+        .nube {
+            top: 30%;
+            left: 7%;
+            width: 13%
+        }
+
+        .nube1 {
+            top: 70%;
+            left: 85%;
+            width: 15%;
+        }
+
+        .container {
+            text-align: right;
+            margin-top: 1rem;
+        }
+
+        .container #image {
+            position: absolute;
+            opacity: 1;
+            z-index: 3;
+            top: 34%;
+            left: 41%;
+            width: 16%;
+        }
+
+        .navegacion {
+            text-align: right;
+            margin-top: 1rem;
+        }
+
+        .navegacion #atras {
+            position: absolute;
+            font-size: clamp(1rem, 1vw, 0.5rem);
+            padding: clamp(0.5rem, 2vw, 0.75rem) 2rem;
+            border-radius: 6px;
+            transition: background 0.2s;
+            width: 100%;
+            max-width: 200px;
+            top: 90%;
+            left: 42%;
+            transform: translateX(-50%);
+            background: #555;
+            color: #fff;
+            border: #000;
+            z-index: 3;
+        }
+        .navegacion #atras:disabled
+        {
+            background-color: #555;
+            cursor: not-allowed;
+        }
+        .navegacion #sig {
+            position: absolute;
+            font-size: clamp(1rem, 1vw, 0.5rem);
+            padding: clamp(0.5rem, 2vw, 0.75rem) 2rem;
+            background: #ff9800;
+            color: #fff;
+            border: #000;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            width: 100%;
+            max-width: 200px;
+            top: 90%;
+            left: 59%;
+            transform: translateX(-50%);
+            z-index: 3;
+        }
+
+        .respuestas {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translateX(-50%);
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            /* 2 botones por fila */
+            gap: 10px;
+            max-width: 400px;
+            width: 90%;
+            z-index: 3;
+        }
+
+        /* Estilo de cada botón */
+        .respuestas button {
+            padding: 12px;
+            font-size: 16px;
+            border-radius: 10px;
+            background-color: #ff9800;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.2s;
+            width: 100%;
+        }
+
+        .respuestas button:hover {
+            background-color: #f5d156;
+            transform: scale(1.05);
+        }
+
+        .respuestas button:disabled {
+            background-color: #555;
+            cursor: not-allowed;
+        }
+
+        .finalizar {
+            text-align: right;
+            margin-top: 1rem;
+        }
+
+        #btnFinalizar {
+            position: absolute;
+            font-size: clamp(1rem, 1vw, 0.5rem);
+            padding: clamp(0.5rem, 2vw, 0.75rem) 2rem;
+            background: #ff9800;
+            color: #fff;
+            border: #000;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            width: 100%;
+            max-width: 200px;
+            top: 90%;
+            left: 59%;
+            transform: translateX(-50%);
+            z-index: 3;
+        }
+    </style>
+</head>
+
+<body>
+    <main class="nivel">
+        <div class="navegacion">
+            <button id="atras">Atrás</button>
+            <button id="sig">Siguiente</button>
+        </div>
+        <div class="container">
+            <h2 id="titulo"></h2>
+            <p id="subtitle"> </p>
+            <img id="image" src="" alt="">
+        </div>
+        <div class="respuestas" id="zonaRespuestas">
+        </div>
+        <div class="finalizar">
+            <button id="btnFinalizar" style="display: none;">Finalizar Nivel</button>
+        </div>
+        <img src="/imagenes/cloud.png" alt="Nube" class="Level1 nube">
+        <img src="/imagenes/cloud.png" alt="Nube" class="Level1 nube1">
+        <img src="/imagenes/pizarron.gif" alt="Board" class="Level1 pizarra">
+        <script src="/funciones_mate_normal.js"></script>
+    </main>
+</body>
+
+</html>

@@ -110,7 +110,6 @@
       }
     });
 
-    // Si completaste todos, marcar facil_lectura_completed
     if (done.length === total && localStorage.getItem('facil_lectura_completed') !== 'true') {
       localStorage.setItem('facil_lectura_completed', 'true');
       alert('¡Felicidades! Has completado todos los niveles de Lectura Fácil');
@@ -155,12 +154,41 @@
       alert('¡Progreso guardado en la base de datos!');
     });
 
-    // 👉 OBTENER progreso desde BD al cargar (solo si lo quieres, puedes comentarlo si no lo usas)
+    // 👉 OBTENER progreso desde BD al cargar y aplicarlo visualmente
     if (usuarioId) {
       try {
         const res = await fetch(`http://localhost:3000/obtenerProgreso?usuarioId=${usuarioId}&materia=${subject}&dificultad=${difficulty}`);
         const data = await res.json();
-        console.log('Progreso desde base de datos:', data);
+
+        if (Array.isArray(data)) {
+          done = data
+            .filter(item => item.Completado === true)
+            .map(item => item.Nivel);
+
+          localStorage.setItem(keyLevels, JSON.stringify(done));
+
+          done.forEach(n => {
+            const a = document.querySelector(`.Nivel${n}`);
+            if (a) {
+              a.textContent += ' ✓';
+              a.style.color = 'green';
+              a.style.pointerEvents = 'none';
+            }
+            const next = document.querySelector(`.Nivel${n + 1}`);
+            if (next) {
+              next.style.pointerEvents = 'auto';
+              next.style.opacity = '1';
+            }
+          });
+
+          if (done.length === total) {
+            localStorage.setItem('facil_lectura_completed', 'true');
+          }
+
+          alert('✅ Progreso cargado desde la base de datos');
+        } else {
+          console.warn('Respuesta inesperada de progreso:', data);
+        }
       } catch (error) {
         console.error('Error al obtener el progreso:', error);
       }

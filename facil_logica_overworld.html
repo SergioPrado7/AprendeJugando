@@ -76,7 +76,6 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
-      // 1) Bloquea si aún no completaste Lectura Fácil
       if (localStorage.getItem('facil_lectura_completed') !== 'true') {
         alert('Debes completar primero Lectura Fácil.');
         return window.location.href = '/html/interfazjuego.html';
@@ -90,7 +89,7 @@
 
       let done = JSON.parse(localStorage.getItem(keyLevels) || '[]');
 
-      // 2) Bloquea niveles 2–5 hasta que completes el anterior
+      // Bloquear niveles 2–5 inicialmente
       for (let i = 2; i <= total; i++) {
         const el = document.querySelector(`.Nivel${i}`);
         if (el) {
@@ -99,14 +98,14 @@
         }
       }
 
-      // 3) Si vienes de completar un nivel (?nivel=X), guárdalo
+      // Si llegamos con ?nivel=X, añadirlo a done
       const lvl = parseInt(new URLSearchParams(location.search).get('nivel'), 10);
       if (lvl >= 1 && lvl <= total && !done.includes(lvl)) {
         done.push(lvl);
         localStorage.setItem(keyLevels, JSON.stringify(done));
       }
 
-      // 4) Marca ✔, bloquea esa nube y desbloquea la siguiente
+      // Marcar niveles completados y desbloquear el siguiente
       done.forEach(n => {
         const a = document.querySelector(`.Nivel${n}`);
         if (a) {
@@ -121,13 +120,12 @@
         }
       });
 
-      // 5) Si completas los 5, fija flag global y felicita
       if (done.length === total && localStorage.getItem('facil_logica_completed') !== 'true') {
         localStorage.setItem('facil_logica_completed', 'true');
         alert('¡Felicidades! Has completado todos los niveles de Lógica Fácil');
       }
 
-      // 6) Al click, redirige al HTML de Lógica Fácil con ?nivel=X
+      // Redirigir al hacer clic
       for (let i = 1; i <= total; i++) {
         const el = document.getElementById(`startNivel${i}`);
         if (el) {
@@ -138,7 +136,7 @@
         }
       }
 
-      // 7) GUARDAR PROGRESO EN BASE DE DATOS
+      // Guardar progreso
       const btnGuardar = document.getElementById('guardarPartida');
       btnGuardar.addEventListener('click', async () => {
         if (!usuarioId || done.length === 0) {
@@ -166,17 +164,43 @@
         alert('¡Progreso guardado en la base de datos!');
       });
 
-      // 8) OBTENER PROGRESO DESDE LA BASE DE DATOS (opcional, solo log)
+      // Obtener progreso desde BD y aplicarlo visualmente
       if (usuarioId) {
         try {
           const res = await fetch(`http://localhost:3000/obtenerProgreso?usuarioId=${usuarioId}&materia=${subject}&dificultad=${difficulty}`);
           const data = await res.json();
-          console.log('Progreso desde base de datos:', data);
+
+          if (Array.isArray(data)) {
+            done = data
+              .filter(item => item.Completado === true)
+              .map(item => item.Nivel);
+
+            localStorage.setItem(keyLevels, JSON.stringify(done));
+
+            done.forEach(n => {
+              const a = document.querySelector(`.Nivel${n}`);
+              if (a) {
+                a.textContent         += ' ✓';
+                a.style.color          = 'green';
+                a.style.pointerEvents = 'none';
+              }
+              const nxt = document.querySelector(`.Nivel${n + 1}`);
+              if (nxt) {
+                nxt.style.pointerEvents = 'auto';
+                nxt.style.opacity       = '1';
+              }
+            });
+
+            if (done.length === total) {
+              localStorage.setItem('facil_logica_completed', 'true');
+            }
+
+            alert('✅ Progreso cargado desde la base de datos');
+          }
         } catch (error) {
           console.error('Error al obtener el progreso:', error);
         }
       }
-
     });
   </script>
 </body>

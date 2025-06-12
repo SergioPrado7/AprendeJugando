@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -45,27 +44,12 @@
       </div>
     </div>
 
-    <!-- Nubes / niveles -->
-    <div class="nivel1">
-      <img src="/imagenes/cloud.png" alt="Nube" class="cloudFacilLectura cloud1">
-      <a href="#" id="startNivel1" class="TEXTO Nivel1">Nivel 1</a>
-    </div>
-    <div class="nivel2">
-      <img src="/imagenes/cloud.png" alt="Nube" class="cloudFacilLectura cloud2">
-      <a href="#" id="startNivel2" class="TEXTO Nivel2">Nivel 2</a>
-    </div>
-    <div class="nivel3">
-      <img src="/imagenes/cloud.png" alt="Nube" class="cloudFacilLectura cloud3">
-      <a href="#" id="startNivel3" class="TEXTO Nivel3">Nivel 3</a>
-    </div>
-    <div class="nivel4">
-      <img src="/imagenes/cloud.png" alt="Nube" class="cloudFacilLectura cloud4">
-      <a href="#" id="startNivel4" class="TEXTO Nivel4">Nivel 4</a>
-    </div>
-    <div class="nivel5">
-      <img src="/imagenes/cloud.png" alt="Nube" class="cloudFacilLectura cloud5">
-      <a href="#" id="startNivel5" class="TEXTO Nivel5">Nivel 5</a>
-    </div>
+    <!-- Niveles -->
+    <div class="nivel1"><img src="/imagenes/cloud.png" alt="Nube" class="cloudFacilLectura cloud1"><a href="#" id="startNivel1" class="TEXTO Nivel1">Nivel 1</a></div>
+    <div class="nivel2"><img src="/imagenes/cloud.png" alt="Nube" class="cloudFacilLectura cloud2"><a href="#" id="startNivel2" class="TEXTO Nivel2">Nivel 2</a></div>
+    <div class="nivel3"><img src="/imagenes/cloud.png" alt="Nube" class="cloudFacilLectura cloud3"><a href="#" id="startNivel3" class="TEXTO Nivel3">Nivel 3</a></div>
+    <div class="nivel4"><img src="/imagenes/cloud.png" alt="Nube" class="cloudFacilLectura cloud4"><a href="#" id="startNivel4" class="TEXTO Nivel4">Nivel 4</a></div>
+    <div class="nivel5"><img src="/imagenes/cloud.png" alt="Nube" class="cloudFacilLectura cloud5"><a href="#" id="startNivel5" class="TEXTO Nivel5">Nivel 5</a></div>
 
     <div class="background">
       <img src="/imagenes/Ground.png" alt="Ground" class="Background ground">
@@ -80,7 +64,7 @@
   </main>
 
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
       if (localStorage.getItem('dificil_logica_completed') !== 'true') {
         alert('Debes completar primero Lógica Difícil.');
         return window.location.href = '/html/interfazjuego.html';
@@ -94,10 +78,7 @@
 
       let done = JSON.parse(localStorage.getItem(keyLevels) || '[]');
 
-      // Desbloquear solo el nivel 1 por defecto
-      document.querySelector('.Nivel1').style.pointerEvents = 'auto';
-      document.querySelector('.Nivel1').style.opacity = '1';
-
+      // Bloquear niveles 2–5
       for (let i = 2; i <= total; i++) {
         const el = document.querySelector(`.Nivel${i}`);
         if (el) {
@@ -106,34 +87,42 @@
         }
       }
 
-      // Registrar nivel si llega con ?nivel=X
+      // Desbloquear siempre nivel 1
+      const nivel1 = document.querySelector('.Nivel1');
+      if (nivel1) {
+        nivel1.style.pointerEvents = 'auto';
+        nivel1.style.opacity = '1';
+      }
+
+      // Registrar avance si ?nivel=X
       const lvl = parseInt(new URLSearchParams(location.search).get('nivel'), 10);
       if (lvl >= 1 && lvl <= total && !done.includes(lvl)) {
         done.push(lvl);
         localStorage.setItem(keyLevels, JSON.stringify(done));
       }
 
-      // Marcar completados y desbloquear el siguiente
+      // Marcar niveles completados
       done.forEach(n => {
-        const a = document.querySelector(`.Nivel${n}`);
-        if (a) {
-          a.textContent += ' ✓';
-          a.style.color = 'green';
-          a.style.pointerEvents = 'none';
+        const el = document.querySelector(`.Nivel${n}`);
+        if (el) {
+          el.textContent += ' ✓';
+          el.style.color = 'green';
+          el.style.pointerEvents = 'none';
         }
-        const next = document.querySelector(`.Nivel${n + 1}`);
-        if (next) {
-          next.style.pointerEvents = 'auto';
-          next.style.opacity = '1';
+        const siguiente = document.querySelector(`.Nivel${n + 1}`);
+        if (siguiente) {
+          siguiente.style.pointerEvents = 'auto';
+          siguiente.style.opacity = '1';
         }
       });
 
+      // Marcar bandera global si terminó todo
       if (done.length === total && localStorage.getItem('dificil_mate_completed') !== 'true') {
         localStorage.setItem('dificil_mate_completed', 'true');
         alert('¡Felicidades! Has completado todos los niveles de Matemáticas Difícil');
       }
 
-      // Abrir nivel correspondiente
+      // Acciones por nivel
       for (let i = 1; i <= total; i++) {
         const el = document.getElementById(`startNivel${i}`);
         if (el) {
@@ -144,7 +133,7 @@
         }
       }
 
-      // Guardar progreso al hacer clic
+      // Guardar progreso
       document.getElementById('guardarPartida').addEventListener('click', async () => {
         if (!usuarioId || done.length === 0) {
           return alert('No hay sesión activa o progreso que guardar.');
@@ -170,6 +159,41 @@
 
         alert('¡Progreso guardado correctamente!');
       });
+
+      // Obtener progreso desde la base de datos
+      if (usuarioId) {
+        try {
+          const res = await fetch(`http://localhost:3000/obtenerProgreso?usuarioId=${usuarioId}&materia=${subject}&dificultad=${difficulty}`);
+          const data = await res.json();
+
+          if (Array.isArray(data)) {
+            done = data.filter(d => d.Completado).map(d => d.Nivel);
+            localStorage.setItem(keyLevels, JSON.stringify(done));
+
+            done.forEach(n => {
+              const el = document.querySelector(`.Nivel${n}`);
+              if (el) {
+                el.textContent += ' ✓';
+                el.style.color = 'green';
+                el.style.pointerEvents = 'none';
+              }
+              const siguiente = document.querySelector(`.Nivel${n + 1}`);
+              if (siguiente) {
+                siguiente.style.pointerEvents = 'auto';
+                siguiente.style.opacity = '1';
+              }
+            });
+
+            if (done.length === total) {
+              localStorage.setItem('dificil_mate_completed', 'true');
+            }
+
+            alert('✅ Progreso cargado desde la base de datos');
+          }
+        } catch (err) {
+          console.error('Error al obtener progreso:', err);
+        }
+      }
     });
   </script>
 </body>

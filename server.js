@@ -204,3 +204,20 @@ app.get('/obtenerProgreso', async (req, res) => {
     res.status(500).json({ mensaje: 'Error en el servidor' });
   }
 });
+
+
+app.get('/obtenerConfiguracion', async (req, res) => {
+  const { usuarioId } = req.query;
+  try {
+    await sql.connect(config);
+    const result = await new sql.Request()
+      .input('UsuarioId', sql.Int, usuarioId)
+      .execute('sp_ObtenerConfiguracion');
+
+    const datos = result.recordset[0];
+    res.json(datos);
+  } catch (err) {
+    console.error('Error al obtener configuración:', err);
+    res.status(500).json({ error: 'Error al obtener configuración' });
+  }
+});

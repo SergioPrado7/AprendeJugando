@@ -138,11 +138,9 @@
       <thead>
         <tr>
           <th>Materia</th>
-          <th>Niveles superados</th>
+          <th>Niveles superados (de 5)</th>
           <th>Dificultad</th>
-          <th>Niveles correctos</th>
-          <th>Niveles incorrectos</th>
-          <th>Progreso del juego</th>
+          <th>Progreso (%)</th>
         </tr>
       </thead>
       <tbody>
@@ -175,28 +173,28 @@
         const data = await response.json();
 
         if (!data || data.length === 0) {
-          tablaBody.innerHTML = `<tr><td colspan="6">No se encontró progreso para este correo.</td></tr>`;
+          tablaBody.innerHTML = `<tr><td colspan="4">No se encontró progreso para este correo.</td></tr>`;
           return;
         }
 
         data.forEach(registro => {
           const materiaCapitalizada = registro.materia.charAt(0).toUpperCase() + registro.materia.slice(1);
           const dificultadCapitalizada = registro.dificultad.charAt(0).toUpperCase() + registro.dificultad.slice(1);
+          const nivelesCompletados = registro.niveles_correctos + registro.niveles_incorrectos;
+          const progreso = ((nivelesCompletados / 5) * 100).toFixed(0);
 
           const fila = `
             <tr>
               <td>${materiaCapitalizada}</td>
-              <td>${registro.niveles_correctos + registro.niveles_incorrectos}</td>
+              <td>${nivelesCompletados} / 5</td>
               <td>${dificultadCapitalizada}</td>
-              <td>${registro.niveles_correctos}</td>
-              <td>${registro.niveles_incorrectos}</td>
-              <td>${registro.progreso.toFixed(0)}%</td>
+              <td>${progreso}%</td>
             </tr>`;
           tablaBody.innerHTML += fila;
         });
       } catch (err) {
         console.error('Error al consultar:', err);
-        tablaBody.innerHTML = `<tr><td colspan="6">Ocurrió un error al consultar el servidor.</td></tr>`;
+        tablaBody.innerHTML = `<tr><td colspan="4">Ocurrió un error al consultar el servidor.</td></tr>`;
       }
     });
   </script>

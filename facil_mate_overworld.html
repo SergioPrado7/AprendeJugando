@@ -86,10 +86,10 @@
       }
 
       const difficulty = "facil",
-        subject = "mate",
-        total = 5,
-        keyLevels = `${difficulty}_${subject}_levels_completed`,
-        usuarioId = localStorage.getItem("usuarioId");
+            subject = "mate",
+            total = 5,
+            keyLevels = `${difficulty}_${subject}_levels_completed`,
+            usuarioId = localStorage.getItem("usuarioId");
 
       let done = JSON.parse(localStorage.getItem(keyLevels) || "[]");
 
@@ -167,6 +167,44 @@
 
         alert("¡Progreso guardado en la base de datos!");
       });
+
+      // Obtener progreso desde BD y aplicarlo visualmente
+      if (usuarioId) {
+        try {
+          const res = await fetch(`http://localhost:3000/obtenerProgreso?usuarioId=${usuarioId}&materia=${subject}&dificultad=${difficulty}`);
+          const data = await res.json();
+
+          if (Array.isArray(data)) {
+            done = data
+              .filter(item => item.Completado === true)
+              .map(item => item.Nivel);
+
+            localStorage.setItem(keyLevels, JSON.stringify(done));
+
+            done.forEach((n) => {
+              const a = document.querySelector(`.Nivel${n}`);
+              if (a) {
+                a.textContent += " ✓";
+                a.style.color = "green";
+                a.style.pointerEvents = "none";
+              }
+              const next = document.querySelector(`.Nivel${n + 1}`);
+              if (next) {
+                next.style.pointerEvents = "auto";
+                next.style.opacity = "1";
+              }
+            });
+
+            if (done.length === total) {
+              localStorage.setItem("facil_mate_completed", "true");
+            }
+
+            alert("✅ Progreso cargado desde la base de datos");
+          }
+        } catch (error) {
+          console.error("Error al obtener el progreso:", error);
+        }
+      }
     });
   </script>
 </body>

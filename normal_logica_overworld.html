@@ -77,7 +77,7 @@
   </main>
 
   <script>
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', async () => {
     if (localStorage.getItem('normal_lectura_completed') !== 'true') {
       alert('Debes completar primero Lectura Normal.');
       return window.location.href = '/html/interfazjuego.html';
@@ -91,6 +91,7 @@
 
     let done = JSON.parse(localStorage.getItem(keyLevels) || '[]');
 
+    // Bloquear niveles 2–5 inicialmente
     for (let i = 2; i <= total; i++) {
       const el = document.querySelector(`.Nivel${i}`);
       if (el) {
@@ -99,12 +100,14 @@
       }
     }
 
+    // Si llegamos con ?nivel=X, añadirlo
     const lvl = parseInt(new URLSearchParams(location.search).get('nivel'), 10);
     if (lvl >= 1 && lvl <= total && !done.includes(lvl)) {
       done.push(lvl);
       localStorage.setItem(keyLevels, JSON.stringify(done));
     }
 
+    // Marcar niveles completados y desbloquear el siguiente
     done.forEach(n => {
       const a = document.querySelector(`.Nivel${n}`);
       if (a) {
@@ -124,12 +127,14 @@
       alert('¡Felicidades! Has completado todos los niveles de Lógica Normal');
     }
 
+    // Siempre habilita Nivel 1
     const nivel1 = document.querySelector('.Nivel1');
     if (nivel1) {
       nivel1.style.pointerEvents = 'auto';
       nivel1.style.opacity       = '1';
     }
 
+    // Clic en niveles
     for (let i = 1; i <= total; i++) {
       const el = document.getElementById(`startNivel${i}`);
       if (el) {
@@ -140,6 +145,7 @@
       }
     }
 
+    // Guardar progreso
     document.getElementById('guardarPartida').addEventListener('click', async () => {
       if (!usuarioId || done.length === 0) {
         return alert('No hay niveles completados o no hay sesión activa.');
@@ -165,6 +171,44 @@
 
       alert('¡Progreso guardado en la base de datos!');
     });
+
+    // Obtener progreso desde base de datos y aplicarlo
+    if (usuarioId) {
+      try {
+        const res = await fetch(`http://localhost:3000/obtenerProgreso?usuarioId=${usuarioId}&materia=${subject}&dificultad=${difficulty}`);
+        const data = await res.json();
+
+        if (Array.isArray(data)) {
+          done = data
+            .filter(item => item.Completado === true)
+            .map(item => item.Nivel);
+
+          localStorage.setItem(keyLevels, JSON.stringify(done));
+
+          done.forEach(n => {
+            const a = document.querySelector(`.Nivel${n}`);
+            if (a) {
+              a.textContent         += ' ✓';
+              a.style.color          = 'green';
+              a.style.pointerEvents = 'none';
+            }
+            const nx = document.querySelector(`.Nivel${n+1}`);
+            if (nx) {
+              nx.style.pointerEvents = 'auto';
+              nx.style.opacity       = '1';
+            }
+          });
+
+          if (done.length === total) {
+            localStorage.setItem('normal_logica_completed', 'true');
+          }
+
+          alert('✅ Progreso cargado desde la base de datos');
+        }
+      } catch (error) {
+        console.error('Error al obtener el progreso:', error);
+      }
+    }
   });
   </script>
 </body>

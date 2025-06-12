@@ -80,8 +80,7 @@
   </main>
 
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      // Requiere haber completado Lectura Difícil
+    document.addEventListener('DOMContentLoaded', async () => {
       if (localStorage.getItem('dificil_lectura_completed') !== 'true') {
         alert('Debes completar primero Lectura Difícil.');
         return window.location.href = '/html/interfazjuego.html';
@@ -95,7 +94,7 @@
 
       let done = JSON.parse(localStorage.getItem(keyLevels) || '[]');
 
-      // Bloquear niveles 2–5 inicialmente
+      // Bloquear niveles 2–5
       for (let i = 2; i <= total; i++) {
         const el = document.querySelector(`.Nivel${i}`);
         if (el) {
@@ -104,21 +103,21 @@
         }
       }
 
-      // Desbloquear siempre Nivel 1
+      // Desbloquear siempre nivel 1
       const nivel1 = document.querySelector('.Nivel1');
       if (nivel1) {
         nivel1.style.pointerEvents = 'auto';
         nivel1.style.opacity = '1';
       }
 
-      // Si venimos con ?nivel=X registrar ese nivel
+      // Si ?nivel=X, agregarlo a done
       const lvl = parseInt(new URLSearchParams(location.search).get('nivel'), 10);
       if (lvl >= 1 && lvl <= total && !done.includes(lvl)) {
         done.push(lvl);
         localStorage.setItem(keyLevels, JSON.stringify(done));
       }
 
-      // Marcar completados y desbloquear el siguiente
+      // Marcar completados
       done.forEach(n => {
         const el = document.querySelector(`.Nivel${n}`);
         if (el) {
@@ -133,13 +132,12 @@
         }
       });
 
-      // Si ya completó todos, marcar bandera global
       if (done.length === total && localStorage.getItem('dificil_logica_completed') !== 'true') {
         localStorage.setItem('dificil_logica_completed', 'true');
         alert('¡Felicidades! Has completado todos los niveles de Lógica Difícil');
       }
 
-      // Click en cada nivel
+      // Clic en niveles
       for (let i = 1; i <= total; i++) {
         const el = document.getElementById(`startNivel${i}`);
         if (el) {
@@ -150,7 +148,7 @@
         }
       }
 
-      // Botón Guardar Progreso
+      // Guardar progreso
       document.getElementById('guardarPartida').addEventListener('click', async () => {
         if (!usuarioId || done.length === 0) {
           return alert('No hay sesión activa o progreso que guardar.');
@@ -176,6 +174,44 @@
 
         alert('¡Progreso guardado correctamente!');
       });
+
+      // Obtener progreso desde base de datos
+      if (usuarioId) {
+        try {
+          const res = await fetch(`http://localhost:3000/obtenerProgreso?usuarioId=${usuarioId}&materia=${subject}&dificultad=${difficulty}`);
+          const data = await res.json();
+
+          if (Array.isArray(data)) {
+            done = data
+              .filter(item => item.Completado === true)
+              .map(item => item.Nivel);
+
+            localStorage.setItem(keyLevels, JSON.stringify(done));
+
+            done.forEach(n => {
+              const el = document.querySelector(`.Nivel${n}`);
+              if (el) {
+                el.textContent += ' ✓';
+                el.style.color = 'green';
+                el.style.pointerEvents = 'none';
+              }
+              const siguiente = document.querySelector(`.Nivel${n + 1}`);
+              if (siguiente) {
+                siguiente.style.pointerEvents = 'auto';
+                siguiente.style.opacity = '1';
+              }
+            });
+
+            if (done.length === total) {
+              localStorage.setItem('dificil_logica_completed', 'true');
+            }
+
+            alert('✅ Progreso cargado desde la base de datos');
+          }
+        } catch (err) {
+          console.error('Error al obtener progreso:', err);
+        }
+      }
     });
   </script>
 </body>

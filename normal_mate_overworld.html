@@ -38,7 +38,7 @@
       </div>
       <div class="pantallaTitulo">
         <a href="/interfazjuego.html">
-          <button class="btn pantallaTitulo">Pantalla de Título</button>
+          <button class="btn pantallaTitulo">Pantalla de Inicio</button>
         </a>
       </div>
     </div>
@@ -78,7 +78,7 @@
   </main>
 
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
       if (localStorage.getItem('normal_logica_completed') !== 'true') {
         alert('Debes completar primero Lógica Normal.');
         return window.location.href = '/html/interfazjuego.html';
@@ -92,7 +92,7 @@
 
       let done = JSON.parse(localStorage.getItem(keyLevels) || '[]');
 
-      // Bloquear niveles 2-5 inicialmente
+      // Bloquear niveles 2–5
       for (let i = 2; i <= total; i++) {
         const el = document.querySelector(`.Nivel${i}`);
         if (el) {
@@ -101,14 +101,14 @@
         }
       }
 
-      // Si llegamos con ?nivel=X lo añadimos al progreso
+      // Si se viene con ?nivel=X
       const lvl = parseInt(new URLSearchParams(location.search).get('nivel'), 10);
       if (lvl >= 1 && lvl <= total && !done.includes(lvl)) {
         done.push(lvl);
         localStorage.setItem(keyLevels, JSON.stringify(done));
       }
 
-      // Marcar completados y desbloquear siguiente
+      // Aplicar progreso visual
       done.forEach(n => {
         const el = document.querySelector(`.Nivel${n}`);
         if (el) {
@@ -123,14 +123,14 @@
         }
       });
 
-      // Desbloquear siempre el nivel 1
+      // Asegurar que el nivel 1 esté desbloqueado
       const nivel1 = document.querySelector('.Nivel1');
       if (nivel1) {
         nivel1.style.pointerEvents = 'auto';
         nivel1.style.opacity = '1';
       }
 
-      // Si completó todo, marcar global
+      // Marcar como completado si ya hizo todo
       if (done.length === total && localStorage.getItem('normal_mate_completed') !== 'true') {
         localStorage.setItem('normal_mate_completed', 'true');
         alert('¡Felicidades! Has completado todos los niveles de Matemáticas Normal');
@@ -173,6 +173,44 @@
 
         alert('¡Progreso guardado en la base de datos!');
       });
+
+      // Recuperar progreso desde base de datos
+      if (usuarioId) {
+        try {
+          const res = await fetch(`http://localhost:3000/obtenerProgreso?usuarioId=${usuarioId}&materia=${subject}&dificultad=${difficulty}`);
+          const data = await res.json();
+
+          if (Array.isArray(data)) {
+            done = data
+              .filter(item => item.Completado === true)
+              .map(item => item.Nivel);
+
+            localStorage.setItem(keyLevels, JSON.stringify(done));
+
+            done.forEach(n => {
+              const el = document.querySelector(`.Nivel${n}`);
+              if (el) {
+                el.textContent += ' ✓';
+                el.style.color = 'green';
+                el.style.pointerEvents = 'none';
+              }
+              const siguiente = document.querySelector(`.Nivel${n + 1}`);
+              if (siguiente) {
+                siguiente.style.pointerEvents = 'auto';
+                siguiente.style.opacity = '1';
+              }
+            });
+
+            if (done.length === total) {
+              localStorage.setItem('normal_mate_completed', 'true');
+            }
+
+            alert('✅ Progreso cargado desde la base de datos');
+          }
+        } catch (err) {
+          console.error('Error al obtener el progreso:', err);
+        }
+      }
     });
   </script>
 </body>

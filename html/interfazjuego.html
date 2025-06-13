@@ -59,35 +59,45 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      // Verifica login
+      // Verifica que esté logueado
       if (!localStorage.getItem('usuarioId')) {
         alert('Debes iniciar sesión.');
         return window.location.href = '../html/login.html';
       }
     });
 
+    // Cerrar sesión sin borrar configuración ni usuarioId
     document.getElementById('btn-logout').addEventListener('click', () => {
+      // Solo redirige al login sin borrar nada del localStorage
       window.location.href = '../html/login.html';
     });
 
+    // Botón Jugar: verifica configuración y redirige al mundo correspondiente
     document.getElementById('btn-jugar').addEventListener('click', () => {
       const dificultad = localStorage.getItem('dificultad');
       const materia    = localStorage.getItem('materia');
+
       if (!dificultad || !materia) {
         alert('Primero configura la dificultad y materia.');
         return window.location.href = '/html/configuracionjuego.html';
       }
+
       let ruta = '';
-      if (dificultad==='Fácil' && materia==='Lectura')  ruta = '../facil_lectura_overworld.html';
-      if (dificultad==='Fácil' && materia==='Lógica')   ruta = '../facil_logica_overworld.html';
-      if (dificultad==='Fácil' && materia==='Matemática') ruta = '../facil_mate_overworld.html';
-      if (dificultad==='Normal' && materia==='Lectura') ruta = '../normal_lectura_overworld.html';
-      if (dificultad==='Normal' && materia==='Lógica')  ruta = '../normal_logica_overworld.html';
+      if (dificultad==='Fácil' && materia==='Lectura')     ruta = '../facil_lectura_overworld.html';
+      if (dificultad==='Fácil' && materia==='Lógica')      ruta = '../facil_logica_overworld.html';
+      if (dificultad==='Fácil' && materia==='Matemática')  ruta = '../facil_mate_overworld.html';
+      if (dificultad==='Normal' && materia==='Lectura')    ruta = '../normal_lectura_overworld.html';
+      if (dificultad==='Normal' && materia==='Lógica')     ruta = '../normal_logica_overworld.html';
       if (dificultad==='Normal' && materia==='Matemática') ruta = '../normal_mate_overworld.html';
-      if (dificultad==='Difícil' && materia==='Lectura') ruta = '../dificil_lectura_overworld.html';
-      if (dificultad==='Difícil' && materia==='Lógica')  ruta = '../dificil_logica_overworld.html';
-      if (dificultad==='Difícil' && materia==='Matemática') ruta = '../dificil_mate_overworld.html';
-      if (!ruta) { alert('Configuración no válida.'); return; }
+      if (dificultad==='Difícil' && materia==='Lectura')   ruta = '../dificil_lectura_overworld.html';
+      if (dificultad==='Difícil' && materia==='Lógica')    ruta = '../dificil_logica_overworld.html';
+      if (dificultad==='Difícil' && materia==='Matemática')ruta = '../dificil_mate_overworld.html';
+
+      if (!ruta) {
+        alert('Configuración no válida.');
+        return;
+      }
+
       window.location.href = ruta;
     });
   </script>

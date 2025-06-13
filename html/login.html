@@ -37,11 +37,13 @@
   </div>
 
   <script>
+    // Mostrar u ocultar contraseña
     document.querySelector('.toggle-password').addEventListener('click', () => {
       const inp = document.getElementById('password');
       inp.type = inp.type === 'password' ? 'text' : 'password';
     });
 
+    // Manejo del formulario de inicio de sesión
     document.querySelector('.login-form').addEventListener('submit', async function(e) {
       e.preventDefault();
 
@@ -58,9 +60,20 @@
         const result = await response.json();
 
         if (result.success) {
-          // Guarda el usuarioId para usar después
+          // Guardar usuarioId
           localStorage.setItem("usuarioId", result.usuarioId);
-          alert('Inicio de sesión exitoso');
+
+          // Verificar si ya hay configuración guardada
+          const dificultad = localStorage.getItem("dificultad");
+          const materia = localStorage.getItem("materia");
+
+          if (dificultad && materia) {
+            alert(`Bienvenido de nuevo. Tienes guardada la configuración: ${dificultad} / ${materia}`);
+          } else {
+            alert('Inicio de sesión exitoso. Aún no has configurado tu juego.');
+          }
+
+          // Redirigir a la interfaz del juego
           window.location.href = '/html/interfazjuego.html';
         } else {
           alert(result.message || 'Credenciales inválidas');

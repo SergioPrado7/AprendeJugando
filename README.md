@@ -81,12 +81,12 @@ PORT=3000
 ```bash
 npm start
 ```
-> Por defecto se ejecutará en `http://localhost:3000`
+> Por defecto se ejecutará en `http://localhost:5000`
 
 #### 6. Accede a la interfaz web
 Abre tu navegador y visita:
 ```
-http://localhost:3000
+http://localhost:5000
 ```
 
 ---

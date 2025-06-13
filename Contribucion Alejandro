@@ -1,0 +1,12 @@
+## [Alejandro Juárez García] ## Rol en el equipo: (ej: Desarrollador)
+
+### **Tareas realizadas** ###
+- Ejemplo: "Desarrolló funciones del backend del sistema"
+- Ejemplo: "Colaboró en la integración entre frontend y backend"
+
+### **Tecnologías usadas** ###
+- Ejemplo: JavaScript, Node.js, Git, HTML
+
+### **Commits Destacados** ###
+- git commit -m "feat: añadida lógica de validación en el backend"
+- git commit -m "fix: corregida integración entre formulario y servidor"

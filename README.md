@@ -20,7 +20,7 @@ Este sistema educativo incluye:
 
 | Área         | Tecnologías |
 |--------------|-------------|
-| **Frontend** | HTML, CSS, JavaScript, React.js |
+| **Frontend** | HTML, CSS, JavaScript|
 | **Backend**  | Node.js + Express |
 | **Base de Datos** | SQL Server |
 | **Correo**   | Nodemailer (para recuperación de contraseña) |

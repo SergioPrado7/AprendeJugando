@@ -1,11 +1,11 @@
-## Sergio Servando Prado Lozano
+## Odalys Castro Enríquez
 
 *Rol en el equipo:* Diseñadora y capacitadora
 
 ### 🛠️ Tareas realizadas
 - Implementó el cambio de contraseña en la interfaz de usuario.
 - Redactó parte del manual de usuario.
-- Participó en la documentación general del proyecto
+- Participó en la documentación general del proyecto.
 
 ### 💻 Tecnologías utilizadas
 - HTML  
